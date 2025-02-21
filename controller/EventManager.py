@@ -44,7 +44,33 @@ class _EventQueue:
     the Event Queue helps EventManager manages the event
     """
     def __init__(self) -> None:
+        """Initialize an empty queue."""
         self.queue = []
+
+    def push(self, item) -> None:
+        """Add an item to the end of the queue."""
+        self.queue.append(item)
+
+    def pop(self) -> Event:
+        """
+        Remove and return the front item of the queue.
+        Raises an error if the queue is empty.
+        """
+        if self.is_empty():
+            raise IndexError("Pop from an empty queue")
+        return self.queue.pop(0)
+
+    def is_empty(self):
+        """Check if the queue is empty."""
+        return len(self.queue) == 0
+
+    def size(self):
+        """Return the number of elements in the queue."""
+        return len(self.queue)
+
+    def __str__(self):
+        """Return a string representation of the queue."""
+        return "Queue: " + " -> ".join(map(str, self.queue))
 
 class EventManager:
     """
