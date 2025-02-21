@@ -1,7 +1,7 @@
 class Avatar:
-    def __init__(self, name="", id_="", weight=0.0, material="", description="", battery_capacity=50.0,
+    def __init__(self, name="", id_="", weight=0.0, material="", description="", battery_capacity=100.0,
                  battery_efficiency=0.0, battery_consumption_rate=1.0, driving_force=0.0, max_speed=1.0,
-                 acceleration=0.0, max_slope=0.0, energy_recharge_rate=10.0, detection_mask=None):
+                 acceleration=0.0, max_slope=6.0, energy_recharge_rate=10.0, detection_mask=None):
         self.name = name
         self.id = id_
         self.weight = weight

@@ -2,7 +2,7 @@ from model.fake import Log, Task, Environment, Avatar, DetectionMask
 from . import Brain
 
 # A simple example of the Brain
-# Basically, it direct the avatar from the start position to the end position, and generate a log
+# Basically, it directs the avatar from the start position to the end position, and generate a log
 class BrainTest(Brain):
     def run(self):
         if not self.current_task:
