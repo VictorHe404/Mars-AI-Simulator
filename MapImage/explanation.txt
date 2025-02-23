@@ -1,1 +1,44 @@
 the image file of map
+这个文件夹里面储存的是火星地形-Louth Crater ice mound（劳斯陨石坑冰丘）的地图数据
+以下是各个文件的说明
+LouthCraterFullColorGraph.png-陨石坑全图的分层设色地形图
+Depth (深度) 是相对于 参考高度面 (例如火星表面某个平均高度) 的深度值。
+在这种情况下，较高的值 (负数接近零) 表示地形较高，而 较低的值 (更大的负数) 表示地形较低或更深。
+例如，-4560 可能表示一个山脊，而 -4700 可能表示一个深坑
+
+1000*1000subgraph.png-是截出来的1000*1000的陨石坑局部图的分层设色地形图
+
+1000*1000Louth_Crater_ice_mound_subPart.tif-截出来的1000*1000的陨石坑局部图另存为的tif文件
+
+1000*1000test.jpg-是该局部图在真实卫星影像上的实际图片
+
+===============================================
+切割tif图像的流程
+
+1.明确image的path
+
+2.明确tif文件的path
+
+2.使用下面这个函数，在matplotlib中呈现jpg文件，并在图中获取2个点在jpg图像里的坐标，这两个点组成了要截取的正方形的右对角线的两个端点
+tifreader.display_image_with_matplotlib(image_path, title="x x x x")
+     坐标轴的原点在左上角
+
+3.用map_jpg_to_tif_coordinates函数去将选择好的jpg坐标转换成tif坐标
+coordinates = tifreader.map_jpg_to_tif_coordinates(image_path, file_path, x, y)
+
+4.用tifreader.calculate_square_Length(file_path, roi)函数去计计算2个点围成正方形的实际边长
+
+5.用tifreader.crop_and_resize_tif(file_path, roi, outputsize)函数去正式截取正方形，若目标截取边长（outputsize）大于等于2个点围成正方形的实际边长
+ ,直接返回由实际边长组成的正方形
+
+6. 明确好输出文件path
+
+7.用save_array_to_tif将截取好的正方形2维数组以tif文件的形式保存到输出文件中
+
+optional：可使用visualize_mars_terrain函数以分层设色地形图hypsometric map的形式可视化地图
+，其中visualize_mars_terrain的第二个参数range（tuple）类型是通过find_min_max_in_polygon返回得到
+
+===============================================
+
+
+
