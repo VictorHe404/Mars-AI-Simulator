@@ -36,7 +36,7 @@ class TestAvatarSystem(unittest.TestCase):
         # Insert test sensor
         cursor.execute('''
             INSERT INTO Sensor (id, name, range, fov, battery_consumption, description, direction)
-            VALUES ('test-sensor-id', 'Test Sensor', 3.0, 90, 0.5, 'Test Description', 0)
+            VALUES ('test-sensor-id', 'tests Sensor', 3.0, 90, 0.5, 'tests Description', 0)
         ''')
         # Link sensor to an avatar
         cursor.execute('''
@@ -48,11 +48,11 @@ class TestAvatarSystem(unittest.TestCase):
 
     def test_sensor_creation_and_save(self):
         """
-        Test the creation and saving of a Sensor object
+        tests the creation and saving of a Sensor object
         """
         # Create a Sensor object
         sensor = Sensor(
-            name="New Test Sensor",
+            name="New tests Sensor",
             range_=10.0,
             fov=120,
             battery_consumption=0.8,
@@ -70,7 +70,7 @@ class TestAvatarSystem(unittest.TestCase):
         conn.close()
 
         self.assertIsNotNone(result)
-        self.assertEqual(result[1], "New Test Sensor")
+        self.assertEqual(result[1], "New tests Sensor")
         self.assertEqual(result[2], 10.0)
         self.assertEqual(result[3], 120)
         self.assertEqual(result[4], 0.8)
@@ -79,7 +79,7 @@ class TestAvatarSystem(unittest.TestCase):
 
     def test_detection_mask_generate(self):
         """
-        Test the generation of detection mask
+        tests the generation of detection mask
         """
         detection_mask = DetectionMask('test-avatar-id')
         # Check if the detection mask has been generated
@@ -87,7 +87,7 @@ class TestAvatarSystem(unittest.TestCase):
 
     def test_detection_mask_apply(self):
         """
-        Test the application of detection mask on a map
+        tests the application of detection mask on a map
         """
         # Create a full map and an empty detection map
         full_map = np.random.randint(0, 10, (10, 10))
@@ -102,7 +102,7 @@ class TestAvatarSystem(unittest.TestCase):
 
     def test_database_connection(self):
         """
-        Test the database connection and integrity
+        tests the database connection and integrity
         """
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
