@@ -1,7 +1,7 @@
 # model/test/generate_fake_map.py
 import time
 import sys
-from model.brain import BrainTest, BrainGreedy
+from model.brain import BrainTest, BrainGreedy, BrainAStar
 from model.fake import Log, Task, Environment, Avatar, DetectionMask
 from os import system, name
 from time import sleep
@@ -35,16 +35,16 @@ def generate_fake_hardcoded_map():
 
 def generate_fake_hardcoded_map():
     hardcoded_map = np.array([
-        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
-        [9, 9, 9, 9, 9, 1, 1, 9, 9, 9],
-        [9, 9, 9, 9, 9, 9, 1, 1, 1, 9],
-        [9, 9, 9, 9, 1, 1, 1, 9, 1, 9],
-        [9, 9, 9, 9, 1, 9, 9, 9, 1, 9],
-        [9, 9, 1, 1, 1, 1, 1, 9, 1, 9],
-        [9, 9, 1, 9, 1, 9, 9, 9, 1, 9],
-        [9, 9, 1, 9, 1, 9, 9, 9, 9, 9],
-        [9, 9, 1, 9, 9, 9, 9, 9, 9, 9],
-        [9, 9, 1, 1, 1, 1, 1, 1, 1, 1]
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 9, 9, 9, 9],
+        [9, 1, 9, 9, 9, 9, 9, 9, 9, 1],
+        [9, 1, 1, 1, 1, 1, 1, 1, 9, 1],
+        [9, 1, 1, 1, 1, 1, 1, 1, 9, 1],
+        [9, 1, 1, 1, 1, 1, 1, 1, 9, 1],
+        [9, 1, 1, 1, 1, 1, 1, 1, 9, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 9, 1],
+        [1, 9, 9, 9, 9, 9, 9, 9, 9, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ], dtype=float)
     return hardcoded_map
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     detection_mask = DetectionMask()
     avatar = Avatar(detection_mask=detection_mask)
 
-    example_task = Task(start_row=1, start_col=5, des_row=9, des_col=9)
+    example_task = Task(start_row=0, start_col=0, des_row=9, des_col=9)
 
     '''
     brain_test = BrainTest()
@@ -113,13 +113,22 @@ if __name__ == "__main__":
     brain_test.set_task(example_task)
     brain_test.set_avatar(avatar)
     trail_logs = brain_test.run()
+    
     '''
-
+    '''
     brain_greedy = BrainGreedy()
     brain_greedy.set_original_map(fake_map)
     brain_greedy.set_task(example_task)
     brain_greedy.set_avatar(avatar)
     trail_logs = brain_greedy.run()
 
-    #display_log(trail_logs)
+    '''
+    brain_AStar = BrainAStar()
+    brain_AStar.set_original_map(fake_map)
+    brain_AStar.set_task(example_task)
+    brain_AStar.set_avatar(avatar)
+    trail_logs = brain_AStar.run()
+
+
+    display_log(trail_logs)
     save_log_to_file(trail_logs)
