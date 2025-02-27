@@ -18,7 +18,7 @@ class BrainGreedy(Brain):
         # Initialization
         x, y = self.current_task.start_row, self.current_task.start_col
         end_x, end_y = self.current_task.des_row, self.current_task.des_col
-        self.detect_map = [[0 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
+        self.detect_map = [[-1 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
         detection_mask = DetectionMask()
         energy = self.current_avatar.battery_capacity
         max_energy = energy
@@ -29,7 +29,7 @@ class BrainGreedy(Brain):
         while (x, y) != (end_x, end_y):
 
             # Used to show the result clearer
-            Time.sleep(1)
+            #Time.sleep(1)
 
             # Apply the detection mask
             self.detect_map = detection_mask.apply_mask(self.detect_map, self.original_map, x, y)
@@ -154,6 +154,8 @@ class BrainGreedy(Brain):
             return parents.pop()
         else:
             return parent_pos
+
+
 
 
 
