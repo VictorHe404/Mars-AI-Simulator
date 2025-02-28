@@ -1,0 +1,6 @@
+.DS_Store
+.idea*
+...*
+*/__pychache__*
+__pycache__*
+*/__pychache__*
