@@ -3,14 +3,18 @@ import sqlite3
 DB_NAME = "avatar.db"
 
 def init_db():
+    """
+    Initialize the database with the required tables: Avatar, Sensor, and AvatarSensor.
+    Ensures unique constraints on id and name for both Avatar and Sensor.
+    """
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    # Create Avatar table if it doesn't exist
+    # Create Avatar table with UNIQUE name
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Avatar (
             id TEXT PRIMARY KEY,  
-            name TEXT NOT NULL,
+            name TEXT UNIQUE NOT NULL,  
             weight FLOAT,
             material TEXT,
             description TEXT,
@@ -25,21 +29,20 @@ def init_db():
         )
     ''')
 
-    # Create Sensor table if it doesn't exist
+    # Create Sensor table with UNIQUE name
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Sensor (
             id TEXT PRIMARY KEY,  
-            name TEXT NOT NULL,
+            name TEXT UNIQUE NOT NULL,  
             range FLOAT,
             fov INT,
             battery_consumption FLOAT,
             description TEXT,
-            direction INT,
-            direction_description TEXT
+            direction INT
         )
     ''')
 
-    # Create Avatar-Sensor relationship table
+    # Create AvatarSensor relationship table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS AvatarSensor (
             avatar_id TEXT,
