@@ -1,4 +1,4 @@
-from EventManager import EventManager, Event, Quit, CommandEvent
+from .EventManager import EventManager, Event, Quit, CommandEvent
 
 class KeyboardController:
     """

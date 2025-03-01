@@ -1,4 +1,7 @@
-import EventManager
+from .EventManager import *
+import sys
+
+from view.WelcomeScreen import *
 
 class Visualizer:
     """
@@ -7,25 +10,41 @@ class Visualizer:
     def __init__(self, event_manager: EventManager) -> None:
         self.event_manager = event_manager
         self.event_manager.register(self)
+        # Initialize instance variables to None
+        self.app: QApplication | None = None
+        self.window: WelcomePage | None = None
+        print("Visualizer is registered")
 
-    def notify(self, event: EventManager.Event) -> None:
+    def initialize(self) -> None:
+        """
+        Initialize the Visualizer
+        """
+        print("Visualizer is initializing")
+
+        if not QApplication.instance():
+            self.app = QApplication(sys.argv)  # Store it as an instance variable
+        else:
+            self.app = QApplication.instance()
+
+        self.window = WelcomePage()  # Store the window as an instance variable
+        self.window.show()
+        self.app.exec()
+
+    def notify(self, event: Event) -> None:
         """
         Notify the listener with the given event
         #### Message to Victor He: your visualizer should receive the CommandEvent
         and them visualize the command
         """
         print(f"Visualizer received: {event}")
-        raise NotImplementedError
 
-    def run(self) -> None:
-        """
-        Run the Visualizer
-        ### you can design the run loop for the visualizer as you see fit
-        """
-        print("Visualizer is running")
-        # while True:
-        #     pass
-        raise NotImplementedError
+        if isinstance(event, Quit):
+            self.event_manager.unregister(self)
+            self.event_manager.post_event(EventManager.Quit("Visualizer is shutting down"))
+        elif isinstance(event, InitialEvent):
+            self.initialize()
+        pass
 
     def __str__(self):
         return "Visualizer"
+

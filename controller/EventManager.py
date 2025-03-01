@@ -13,6 +13,19 @@ class Quit(Event):
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
+class InitialEvent(Event):
+    """
+    Initial Event
+    """
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+class TicketEvent(Event):
+    """
+    Ticket Event
+    """
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
 
 class CommandEvent(ABC):
     """
@@ -98,6 +111,7 @@ class EventManager:
         Process the event in the event queue
         """
         if self.event_queue.is_empty():
+            print("No event to process")
             return
         event = self.event_queue.pop()
 
