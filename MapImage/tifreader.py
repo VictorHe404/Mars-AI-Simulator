@@ -1,3 +1,4 @@
+#new import statements
 import rasterio
 from rasterio.transform import from_origin
 import matplotlib.pyplot as plt
