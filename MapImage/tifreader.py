@@ -3,9 +3,8 @@ from rasterio.transform import from_origin
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from rasterio.transform import from_bounds, Affine
 from matplotlib.path import Path
-from sqlalchemy.engine.result import null_result
+
 
 
 def read_tif_to_array(file_path: str) -> np.ndarray:
