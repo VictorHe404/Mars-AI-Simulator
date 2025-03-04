@@ -7,6 +7,9 @@ from PyQt6.QtGui import QPixmap, QAction, QPalette, QBrush
 from PyQt6.QtCore import Qt
 import os
 
+from view import MainPage
+
+
 class WelcomePage(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -132,7 +135,9 @@ class WelcomePage(QMainWindow):
         )
 
     def start_application(self):
-        QMessageBox.information(self, "Start", "Entering the main page of the application.")
+        self.main_page = MainPage.MapInterface()
+        self.main_page.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
