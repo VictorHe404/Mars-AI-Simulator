@@ -56,12 +56,6 @@ class Simulator:
         (self.target_map,self.map_minValue,self.map_maxValue)=self.map_manager.get_mapByName(name)
 
 
-simulator=Simulator()
-simulator.set_map("100x100Louth_Crater_ice_mound_subPart")
-print(simulator.target_map)
-print(simulator.map_maxValue)
-print(simulator.map_minValue)
-
 
 
 
