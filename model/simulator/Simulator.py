@@ -28,6 +28,7 @@ class Simulator:
         self.target_avatar=None
         self.brain_list=None
         self.avatar_manager=None
+        self.target_brain=None
         self.target_environment=None
         self.target_task=None
         self.map_manager=MapManager.MapManager()
@@ -38,12 +39,22 @@ class Simulator:
 
     #def set_avatar(self,name):
         """
-        set the tager avatar's name
+        set the tager_avatar with a Avatar object
         Parameters:
-        name(string): represent the map’s name in the map_names
-        Returns:
-        the 2d array in the map_list
+        name(string): represent the Avatar object’s name
         """
+
+    #def set_brain(self,name:str):
+    """
+    set the target_brain with a Avatar object
+    Parameters:
+    name(string): represent the Brain object’s name
+    """
+
+    # def get_Avatarnames(self):
+    # return the avatar_names from AvatarManager class
+
+    # add_avatar(String name): Boolean
 
 
     def set_map(self, name:str):
@@ -55,6 +66,33 @@ class Simulator:
         """
         (self.target_map,self.map_minValue,self.map_maxValue)=self.map_manager.get_mapByName(name)
 
+    def set_task(self,s_row,s_col,d_row, d_col) :
+        """
+        set the target_task's related 4 fields
+        Parameters:
+        s_row(int) :start_row
+        s_col(int) :start_col
+        d_row(int) :des_row
+        d_col(int) :des_col
+        """
+        self.target_task.start_row=s_row
+        self.target_task.start_col=s_col
+        self.target_task.des_row=d_row
+        self.target_task.des_col=d_col
+
+    def get_brainnames(self):
+        """
+
+        :return: brain_list(Str[]) : a Brain's name list
+        """
+        return self.brain_list
+
+#test code block:
+#simulator=Simulator()
+#simulator.set_map("100x100Louth_Crater_ice_mound_subPart")
+#print(simulator.target_map)
+#print(simulator.map_maxValue)
+#print(simulator.map_minValue)
 
 
 
