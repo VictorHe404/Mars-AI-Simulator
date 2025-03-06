@@ -19,12 +19,9 @@ def init_db():
             material TEXT,
             description TEXT,
             battery_capacity FLOAT,
-            battery_efficiency FLOAT,
             battery_consumption_rate FLOAT,
             driving_force FLOAT,
-            max_speed FLOAT,
-            acceleration FLOAT,
-            max_slope FLOAT,
+            speed FLOAT,
             energy_recharge_rate FLOAT
         )
     ''')

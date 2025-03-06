@@ -1,4 +1,8 @@
-from model.fake import Log, Task, Environment, Avatar, DetectionMask
+#from model.fake import Log, Task, Environment, Avatar, DetectionMask
+import math
+
+from model.simulator import Simulator, Task, Environment, Log
+from model.avatar import Avatar, DetectionMask
 from . import Brain
 import time as Time
 from collections import deque
@@ -18,11 +22,11 @@ class BrainGreedy(Brain):
         # Initialization
         x, y = self.current_task.start_row, self.current_task.start_col
         end_x, end_y = self.current_task.des_row, self.current_task.des_col
-        self.detect_map = [[-1 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
-        detection_mask = DetectionMask()
+        self.detect_map = [[114514 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
+        detection_mask = self.current_avatar.get_detection_mask()
         energy = self.current_avatar.battery_capacity
         max_energy = energy
-        energy_recharge = self.current_avatar.energy_recharge_rate
+        energy_recharge = self.current_avatar.energy_recharge_rate* (self.current_environment.get_light_intensity())
 
 
         # Start running the simulation
@@ -55,7 +59,8 @@ class BrainGreedy(Brain):
 
 
             else:
-                c = self.cost(x,y,next_x,next_y)
+                #c = self.cost(x,y,next_x,next_y)
+                c = self.current_avatar.battery_consumption_rate * 10
 
                 # Recharge if the avatar cannot move due to energy
                 if c > energy:
@@ -66,8 +71,8 @@ class BrainGreedy(Brain):
                     energy = max_energy
                     #print("Energy recharged")
 
-                energy -= (c+1)
-                self.time += (c+1)
+                energy -= c
+                self.time += self.cost(x,y,next_x,next_y)
 
                 # Add the parent position to the stack if not back tracking
                 if next_x != parent_x or next_y != parent_y:
@@ -89,10 +94,11 @@ class BrainGreedy(Brain):
     def reset(self):
         self.task_trail.clear()
         self.time = 0
-        self.detect_map = [[0 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
+        self.detect_map = [[114514 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
         return True
 
     # Determine whether the position is movable
+    '''
     def movable(self, avatar_x, avatar_y, target_x, target_y):
         #print("Movable is called")
         threshold = self.current_avatar.get_max_slope()
@@ -102,12 +108,23 @@ class BrainGreedy(Brain):
             return False
         else:
             return True
+    '''
+
+    def movable(self, avatar_x, avatar_y, target_x, target_y):
+        return self.current_avatar.get_movable(self.detect_map[avatar_x][avatar_y], self.detect_map[target_x][target_y])
 
 
-    # Determine the cost to reach the position
+
     def cost(self, avatar_x, avatar_y, target_x, target_y):
-        return abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y])
+        base_time = self.current_avatar.calculate_time_per_grid()
+        elevation_difference = abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y])
+        distance = 10
+        slope_factor = 1.0
 
+        # Calculate the actual time required based on elevation difference
+        actual_time = base_time * (1 + slope_factor * (elevation_difference / distance))
+
+        return math.ceil(actual_time)
 
     # Choose the best direction to go
     def choose_best_direction(self,avatar_x, avatar_y, goal_x, goal_y, visited, parents):

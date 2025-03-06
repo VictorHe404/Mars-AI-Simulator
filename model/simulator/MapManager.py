@@ -15,7 +15,7 @@ class MapManager:
         1 is default value, represent the 100x100Louth_Crater_ice_mound_subPart.tif
         map_path (str) : store the document's path , the document contains all the map files under this document
         """
-        self.map_names=["100x100Louth_Crater_ice_mound_subPart"]
+        self.map_names=["100x100Louth_Crater_ice_mound_subPart", "100x100Louth_Crater_ice_mound_subPart_sharp"]
         base_dir = os.path.dirname(os.path.abspath(__file__))  # get abs path of `MapManager.py`
         project_repo_dir = os.path.abspath(os.path.join(base_dir, "../../"))  # move 2 level of directory to the repo directory
         self.map_path = os.path.join(project_repo_dir, "MapImage/")  # combie the above path with `MapImage/`

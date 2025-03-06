@@ -17,6 +17,68 @@ def read_tif_to_array(file_path: str) -> np.ndarray:
         array = src.read(1).astype(np.float32)
         return array
 
+def downsample_min_max(elevation_map, factor=10):
+    rows, cols = elevation_map.shape
+    new_rows, new_cols = rows // factor, cols // factor
+
+    elevation_map = elevation_map[:new_rows * factor, :new_cols * factor]
+    min_map = elevation_map.reshape(new_rows, factor, new_cols, factor).min(axis=(1, 3))
+    max_map = elevation_map.reshape(new_rows, factor, new_cols, factor).max(axis=(1, 3))
+
+    return min_map, max_map
+
+
+def adaptive_downsample(elevation_map, factor=10):
+    rows, cols = elevation_map.shape
+    new_rows, new_cols = rows // factor, cols // factor
+
+    global_avg = np.mean(elevation_map)
+
+    elevation_map = elevation_map[:new_rows * factor, :new_cols * factor]
+
+    reshaped_map = elevation_map.reshape(new_rows, factor, new_cols, factor)
+
+    local_avg = reshaped_map.mean(axis=(1, 3))
+
+    local_max = reshaped_map.max(axis=(1, 3))
+    local_min = reshaped_map.min(axis=(1, 3))
+
+    downsampled_map = np.where(local_avg > global_avg, local_max, local_min)
+
+    return downsampled_map
+
+
+def average_downsample(input_array, factor=10):
+    rows, cols = input_array.shape
+    new_rows, new_cols = rows // factor, cols // factor
+
+    input_array = input_array[:new_rows * factor, :new_cols * factor]
+
+    reshaped_array = input_array.reshape(new_rows, factor, new_cols, factor)
+
+    cropped_array = reshaped_array.mean(axis=(1, 3))  # Average pooling to downscale
+
+    return cropped_array
+
+
+
+def visualize_mars_terrain_without_range(image_data: np.ndarray, nodata_value: float = -3.4028227e+38) -> None:
+    masked_array = np.ma.masked_equal(image_data, nodata_value)
+
+    valid_data = image_data[image_data != nodata_value]
+    vmin, vmax = valid_data.min(), valid_data.max()
+
+    plt.figure(figsize=(10, 8))
+    img = plt.imshow(masked_array, cmap='terrain', vmin=vmin, vmax=vmax, aspect='auto')
+
+    plt.colorbar(img, label='Elevation/Depth')
+
+    plt.title("Mars Terrain Visualization")
+    plt.xlabel("X (Pixels)")
+    plt.ylabel("Y (Pixels)")
+
+    plt.show()
+
 
 
 def crop_and_resize_tif(tif_path: str, roi: tuple, output_size=(100, 100)) -> np.ndarray:

@@ -4,15 +4,18 @@ from model.avatar.database import DB_NAME
 from model.avatar.sensor import Sensor
 
 class DetectionMask:
-    def __init__(self, avatar_id):
+    def __init__(self, avatar_id, database_available = True):
         """
         Initialize DetectionMask for a specific Avatar.
         :param avatar_id: The ID of the Avatar for which the detection mask is calculated.
         """
         self.avatar_id = avatar_id
         self.detectable_positions = set()  # Stores (dx, dy) offsets from the Avatar's position.
-        self.sensors = self.get_sensors()
-        self.generate_mask()
+        self.database_available = database_available
+
+        if self.database_available:
+            self.sensors = self.get_sensors()
+            self.generate_mask()
 
     def get_sensors(self):
         """
@@ -94,5 +97,12 @@ class DetectionMask:
         Refresh the sensor list by re-querying the database and regenerating the mask.
         This should be called when sensors are bound or unbound.
         """
-        self.sensors = self.get_sensors()
+
+        if self.database_available:
+            self.sensors = self.get_sensors()
+            self.generate_mask()
+
+    def refresh_sensors_without_database(self, sensor_list):
+        self.sensors = sensor_list
         self.generate_mask()
+
