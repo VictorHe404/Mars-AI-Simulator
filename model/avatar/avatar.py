@@ -8,8 +8,8 @@ from model.avatar.detection_mask import DetectionMask
 class Avatar:
     def __init__(self, name, weight, material, description,
                  battery_capacity, battery_consumption_rate,
-                 driving_force, speed , energy_recharge_rate,
-                 sensors=None, avatar_id=None, database_available = True):
+                 driving_force, speed, energy_recharge_rate,
+                 sensors=None, avatar_id=None, database_available=True):
         """
         Initialize Avatar without checking for duplicates.
         Relies on database UNIQUE constraint to enforce unique id and name.
@@ -30,7 +30,6 @@ class Avatar:
         self.database_available = database_available
 
         if self.database_available:
-
             if avatar_id is None:
                 try:
                     self.save_to_db()
@@ -38,11 +37,10 @@ class Avatar:
                     print(f"Failed to save Avatar: {e}")
                     raise
 
-            # Initialize detection mask
+        # Initialize detection mask
         self.detection_mask = DetectionMask(self.id, database_available)
 
         # Bind provided sensors to this Avatar
-
         if self.database_available:
             for sensor in self.sensors:
                 self.bind_sensor(sensor)
@@ -50,21 +48,18 @@ class Avatar:
     def save_to_db(self):
         """
         Save this Avatar to the database as a new record.
-        Relies on database UNIQUE constraint to ensure unique name and id.
         """
-
         if self.database_available:
             query = '''
                 INSERT INTO Avatar (id, name, weight, material, description,
                                     battery_capacity, battery_consumption_rate,
-                                    driving_force, speed, max_slope, energy_recharge_rate)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    driving_force, speed, energy_recharge_rate)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             '''
             params = (
                 self.id, self.name, self.weight, self.material, self.description,
                 self.battery_capacity, self.battery_consumption_rate,
-                self.driving_force, self.speed,
-                self.energy_recharge_rate
+                self.driving_force, self.speed, self.energy_recharge_rate
             )
 
             with sqlite3.connect(DB_NAME) as conn:
@@ -72,62 +67,65 @@ class Avatar:
                 cursor.execute(query, params)
                 conn.commit()
 
-    def bind_sensor(self, sensor):
+    @staticmethod
+    def get_all_avatar_names():
         """
-        Bind a sensor to this Avatar (avoid duplicate binding in AvatarSensor table)
-        Automatically refresh the detection mask after binding.
+        Retrieve a list of all Avatar names stored in the database.
         """
+        query = "SELECT name FROM Avatar"
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
 
-        if self.database_available:
-            query = 'SELECT * FROM AvatarSensor WHERE avatar_id=? AND sensor_id=?'
-            params = (self.id, sensor.id)
+        return [row[0] for row in rows]
 
-            with sqlite3.connect(DB_NAME) as conn:
-                cursor = conn.cursor()
-                cursor.execute(query, params)
-                existing = cursor.fetchone()
+    @staticmethod
+    def delete_avatar(name):
+        """
+        Delete an Avatar from the database by name and remove all its sensor bindings.
+        """
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
 
-                if not existing:
-                    cursor.execute('''
-                        INSERT INTO AvatarSensor (avatar_id, sensor_id) VALUES (?,?)
-                    ''', (self.id, sensor.id))
-                    conn.commit()
-                    print(f"Sensor '{sensor.name}' bound to Avatar '{self.name}'.")
-                else:
-                    print(f"Sensor '{sensor.name}' already bound to Avatar '{self.name}'. Skipping.")
+            cursor.execute("SELECT id FROM Avatar WHERE name = ?", (name,))
+            row = cursor.fetchone()
 
-            # Auto-refresh detection mask after binding
-            if self.detection_mask:
-                self.detection_mask.refresh_sensors()
-        else:
-            if sensor not in self.sensors:
-                self.sensors.append(sensor)
-                print(f"Sensor '{sensor.name}' added to Avatar '{self.name}'.")
-            else:
-                print(f"Sensor '{sensor.name}' is already assigned to Avatar '{self.name}'.")
+            if not row:
+                print(f"Avatar '{name}' not found in database.")
+                return False
 
-            if self.detection_mask:
-                self.detection_mask.refresh_sensors_without_database(self.sensors)
+            avatar_id = row[0]
 
-    def calculate_max_slope_difference(self, friction, gravity, distance):
-        if self.driving_force <= 0 or self.weight <= 0:
-            return 0
+            cursor.execute("DELETE FROM AvatarSensor WHERE avatar_id = ?", (avatar_id,))
 
-        normal_force = self.weight * gravity
+            cursor.execute("DELETE FROM Avatar WHERE id = ?", (avatar_id,))
+            conn.commit()
 
-        # Calculate max slope in radians
-        max_slope_radians = math.atan((self.driving_force - friction * normal_force) / normal_force)
+        print(f"Avatar '{name}' and its sensor bindings deleted.")
+        return True
 
-        # Convert to degrees
-        max_slope_degrees = math.degrees(max_slope_radians)
+    @staticmethod
+    def get_avatar_by_name(name):
+        """
+        Retrieve an Avatar instance from the database by name.
+        :param name: The unique name of the Avatar.
+        :return: Avatar instance if found, else None.
+        """
+        query = "SELECT * FROM Avatar WHERE name = ?"
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (name,))
+            row = cursor.fetchone()
 
-        # Calculate max elevation difference
-        max_elevation_difference = distance * math.tan(max_slope_radians)
-
-        self.max_slope = max_elevation_difference
-
-    def calculate_time_per_grid(self):
-        return math.ceil(10/self.speed)
+        if row:
+            return Avatar(
+                name=row[1], weight=row[2], material=row[3], description=row[4],
+                battery_capacity=row[5], battery_consumption_rate=row[6],
+                driving_force=row[7], speed=row[8], energy_recharge_rate=row[9],
+                avatar_id=row[0]
+            )
+        return None
 
     @staticmethod
     def get_avatar_by_id(avatar_id):
@@ -157,12 +155,49 @@ class Avatar:
             )
         return None
 
+
+
+    def bind_sensor(self, sensor):
+        """
+        Bind a sensor to this Avatar (avoid duplicate binding in AvatarSensor table).
+        Automatically refresh the detection mask after binding.
+        """
+        if self.database_available:
+            query = 'SELECT COUNT(*) FROM AvatarSensor WHERE avatar_id=? AND sensor_id=?'
+            params = (self.id, sensor.id)
+
+            with sqlite3.connect(DB_NAME) as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                exists = cursor.fetchone()[0] > 0  # Check if it already exists
+
+                if not exists:
+                    cursor.execute('''
+                        INSERT INTO AvatarSensor (avatar_id, sensor_id) VALUES (?,?)
+                    ''', (self.id, sensor.id))
+                    conn.commit()
+                    print(f"Sensor '{sensor.name}' bound to Avatar '{self.name}'.")
+                else:
+                    print(f"Sensor '{sensor.name}' already bound to Avatar '{self.name}'. Skipping.")
+
+            # Auto-refresh detection mask after binding
+            if self.detection_mask:
+                self.detection_mask.refresh_sensors()
+        else:
+            if not any(s.id == sensor.id for s in self.sensors):
+                self.sensors.append(sensor)
+                print(f"Sensor '{sensor.name}' added to Avatar '{self.name}'.")
+            else:
+                print(f"Sensor '{sensor.name}' is already assigned to Avatar '{self.name}'.")
+
+            if self.detection_mask:
+                self.detection_mask.refresh_sensors_without_database(self.sensors)
+
     def unbind_sensor(self, sensor):
         """
         Unbind a sensor from this Avatar.
         Automatically refresh the detection mask after unbinding.
         """
-
         if self.database_available:
             query = '''
                 DELETE FROM AvatarSensor WHERE avatar_id=? AND sensor_id=?
@@ -177,17 +212,40 @@ class Avatar:
             self.sensors = [s for s in self.sensors if s.id != sensor.id]
             print(f"Sensor '{sensor.name}' unbound from Avatar '{self.name}'.")
 
-            # Auto-refresh detection mask after unbinding
             if self.detection_mask:
                 self.detection_mask.refresh_sensors()
                 if hasattr(self, '_sensor_cache'):
                     del self._sensor_cache
-
         else:
             self.sensors = [s for s in self.sensors if s.id != sensor.id]
             print(f"Sensor '{sensor.name}' unbound from Avatar '{self.name}'.")
             if self.detection_mask:
                 self.detection_mask.refresh_sensors_without_database(self.sensors)
+
+
+
+    def calculate_max_slope_difference(self, friction, gravity, distance):
+        if self.driving_force <= 0 or self.weight <= 0:
+            return 0
+
+        normal_force = self.weight * gravity
+
+        max_slope_radians = math.atan((self.driving_force - friction * normal_force) / normal_force)
+
+        max_slope_degrees = math.degrees(max_slope_radians)
+
+        max_elevation_difference = distance * math.tan(max_slope_radians)
+
+        self.max_slope = max_elevation_difference
+    def get_movable(self, start_elevation, end_elevation):
+        """
+        Check if this Avatar can move from start to end elevation.
+        """
+        elevation_difference = abs(end_elevation - start_elevation)
+        return elevation_difference <= self.max_slope
+
+    def calculate_time_per_grid(self):
+        return math.ceil(10/self.speed)
 
     def get_sensors(self):
 
@@ -218,7 +276,6 @@ class Avatar:
                 print(f"Failed to retrieve sensors for Avatar ID = {self.id}: {e}")
                 return []
 
-            # Cache the result
             self._sensor_cache = [Sensor(
                 name=row[1],
                 range_=row[2],
@@ -240,14 +297,6 @@ class Avatar:
         if self.database_available:
             self.detection_mask = DetectionMask(self.id)
         return self.detection_mask
-
-
-    def get_movable(self, start_elevation, end_elevation):
-        """
-        Check if this Avatar can move from start to end elevation.
-        """
-        elevation_difference = abs(end_elevation - start_elevation)
-        return elevation_difference <= self.max_slope
 
     def print_avatar(self):
         """

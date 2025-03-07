@@ -2,20 +2,21 @@ from model.avatar import Avatar, Sensor, DetectionMask
 from model.simulator import Simulator, environment, Log, MapManager, Task
 
 
+off_db_avatar = Avatar(
+    name="Mars Explorer X",
+    weight=80,
+    material="Titanium Alloy",
+    description="A high-endurance avatar designed for Mars exploration.",
+    battery_capacity=200,
+    battery_consumption_rate=5,
+    driving_force=280,
+    speed=1,
+    energy_recharge_rate=20,
+    sensors=[],
+    database_available=False
+)
+
 if __name__ == "__main__":
-    off_db_avatar = Avatar(
-        name="Mars Explorer X",
-        weight=80,
-        material="Titanium Alloy",
-        description="A high-endurance avatar designed for Mars exploration.",
-        battery_capacity=200,
-        battery_consumption_rate=5,
-        driving_force=280,
-        speed=1,
-        energy_recharge_rate=20,
-        sensors=[],
-        database_available=False
-    )
 
     radar_sensor = Sensor(
         name="Radar-360",

@@ -10,6 +10,8 @@ def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
+    cursor.execute("DROP TABLE IF EXISTS Avatar")
+
     # Create Avatar table with UNIQUE name
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Avatar (
@@ -44,11 +46,10 @@ def init_db():
         CREATE TABLE IF NOT EXISTS AvatarSensor (
             avatar_id TEXT,
             sensor_id TEXT,
-            FOREIGN KEY (avatar_id) REFERENCES Avatar(id),
-            FOREIGN KEY (sensor_id) REFERENCES Sensor(id)
+            FOREIGN KEY (avatar_id) REFERENCES Avatar(id) ON DELETE CASCADE,
+            FOREIGN KEY (sensor_id) REFERENCES Sensor(id) ON DELETE CASCADE
         )
     ''')
-
     conn.commit()
     conn.close()
     print("Database initialized successfully!")

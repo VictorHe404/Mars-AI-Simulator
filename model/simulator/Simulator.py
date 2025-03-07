@@ -13,7 +13,7 @@ from model.simulator.environment import Environment
 from model.simulator.task import Task
 from model.avatar import Avatar, DetectionMask,  Sensor
 import model.brain as Brain
-
+from model.test.integrated_test import off_db_avatar
 
 
 
@@ -61,13 +61,28 @@ class Simulator:
 
         self.result_directory_path = "../result"
 
-
-    #def set_avatar(self,name):
+    def set_avatar(self, name):
         """
-        set the tager_avatar with a Avatar object
+        Set the target_avatar with an Avatar object.
         Parameters:
-        name(string): represent the Avatar object’s name
+        name (string): The Avatar object's name.
         """
+        avatar = Avatar.get_avatar_by_name(name)  # Retrieve Avatar from database
+        if avatar:
+            self.target_avatar = avatar
+            print(f"Avatar '{name}' has been set as the target avatar.")
+
+            if self.target_environment:
+                self.target_avatar.calculate_max_slope_difference(
+                    self.target_environment.get_friction(),
+                    self.target_environment.get_gravity(),
+                    10
+                )
+
+            if self.target_brain:
+                self.target_brain.set_avatar(self.target_avatar)
+        else:
+            print(f"Avatar '{name}' not found in database.")
 
     def set_avatar_no_db(self, avatar_no_db:Avatar):
         self.target_avatar = avatar_no_db
@@ -76,11 +91,45 @@ class Simulator:
         if self.target_brain is not None:
             self.target_brain.set_avatar(self.target_avatar)
 
+    @staticmethod
+    def get_avatar_names():
+        """
+        Retrieve all Avatar names stored in the database.
+        :return: List of Avatar names.
+        """
+        return Avatar.get_all_avatar_names()
 
-    # def get_Avatarnames(self):
-    # return the avatar_names from AvatarManager class
+    @staticmethod
+    def add_avatar(name=None):
+        """
+        Add a new Avatar to the database if it does not already exist.
+        :param name: The unique name of the new Avatar.
+        :return: Boolean indicating success or failure.
+        """
+        if name is None:
+            from model.test.integrated_test import off_db_avatar
+            name = off_db_avatar.name
+        existing_avatar = Avatar.get_avatar_by_name(name)
+        if existing_avatar:
+            print(f"Avatar '{name}' already exists in the database.")
+            return False
 
-    # add_avatar(String name): Boolean
+        # Create a new Avatar instance and save it to the database
+        new_avatar = Avatar(
+            name=name,
+            weight=75.0,  # Default values (can be modified later)
+            material="Unknown",
+            description="New Avatar",
+            battery_capacity=1000.0,
+            battery_consumption_rate=10.0,
+            driving_force=50.0,
+            speed=2.0,
+            energy_recharge_rate=5.0,
+            sensors=[]
+        )
+        new_avatar.save_to_db()
+        print(f"New Avatar '{name}' added successfully.")
+        return True
 
 
     def set_map(self, name:str):
