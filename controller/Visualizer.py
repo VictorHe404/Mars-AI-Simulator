@@ -1,13 +1,14 @@
 from .EventManager import *
 import sys
-
+from PyQt6.QtCore import QObject
 from view.WelcomeScreen import *
 
-class Visualizer:
+class Visualizer(QObject):
     """
     Visualizer: visualize the event
     """
     def __init__(self, event_manager: EventManager) -> None:
+        super().__init__()
         self.event_manager = event_manager
         self.event_manager.register(self)
         # Initialize instance variables to None
@@ -40,10 +41,11 @@ class Visualizer:
 
         if isinstance(event, Quit):
             self.event_manager.unregister(self)
-            self.event_manager.post_event(EventManager.Quit("Visualizer is shutting down"))
+            self.window.close()
         elif isinstance(event, InitialEvent):
             self.initialize()
-        pass
+        elif isinstance(event, TicketEvent):
+            pass
 
     def __str__(self):
         return "Visualizer"

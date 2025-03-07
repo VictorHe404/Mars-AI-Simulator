@@ -131,7 +131,7 @@ class Simulator:
             self.target_brain.set_environment(previous_brain.current_environment)
         else:
             # Follow the existing logic if no previous brain exists
-            if self.target_map.size != 0:
+            if self.target_map.size != 0: # len(self.target_map) != 0
                 self.target_brain.set_original_map(self.target_map)
 
             if self.target_avatar is not None:

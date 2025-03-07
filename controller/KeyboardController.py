@@ -14,7 +14,6 @@ class KeyboardController:
         """
         if isinstance(event, Quit):
             self.event_manager.unregister(self)
-            self.event_manager.post_event(Quit("Keyboard Controller is shutting down"))
 
     def run(self) -> None:
         """
