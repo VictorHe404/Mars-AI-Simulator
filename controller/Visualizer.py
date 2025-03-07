@@ -13,6 +13,8 @@ class Visualizer:
         # Initialize instance variables to None
         self.app: QApplication | None = None
         self.window: WelcomePage | None = None
+
+        self.main_page = None
         print("Visualizer is registered")
 
     def initialize(self) -> None:
@@ -27,6 +29,7 @@ class Visualizer:
             self.app = QApplication.instance()
 
         self.window = WelcomePage()  # Store the window as an instance variable
+        self.main_page = self.window.get_main_page()
         self.window.show()
         self.app.exec()
 
@@ -44,7 +47,15 @@ class Visualizer:
         elif isinstance(event, InitialEvent):
             self.initialize()
         pass
-
+    
+    def update_main_page(self, main_page):
+        """
+        
+        """
+        self.main_page = main_page
+    
     def __str__(self):
         return "Visualizer"
 
+    def update_mini_map(self, mini_map_image):
+        self.main_page.mini_map.update_mini_map(mini_map_image)
