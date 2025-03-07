@@ -1,6 +1,7 @@
-from  .EventManager import *
+from .EventManager import *
 from .KeyboardController import KeyboardController
 from .Visualizer import Visualizer
+
 
 class Application:
     """
@@ -26,7 +27,6 @@ class Application:
         elif isinstance(event, TicketEvent):
             pass
 
-
     def run(self) -> None:
         """
         Run the application
@@ -37,7 +37,6 @@ class Application:
         while self.running:
             self.event_manager.process_event()
             event = TicketEvent("Application is running")
-
 
     def __str__(self):
         return "Application"
