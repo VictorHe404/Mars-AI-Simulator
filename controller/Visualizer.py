@@ -1,18 +1,21 @@
 from .EventManager import *
 import sys
-
+from PyQt6.QtCore import QObject
 from view.WelcomeScreen import *
 
-class Visualizer:
+class Visualizer(QObject):
     """
     Visualizer: visualize the event
     """
     def __init__(self, event_manager: EventManager) -> None:
+        super().__init__()
         self.event_manager = event_manager
         self.event_manager.register(self)
         # Initialize instance variables to None
         self.app: QApplication | None = None
         self.window: WelcomePage | None = None
+
+        self.main_page = None
         print("Visualizer is registered")
 
     def initialize(self) -> None:
@@ -27,6 +30,7 @@ class Visualizer:
             self.app = QApplication.instance()
 
         self.window = WelcomePage()  # Store the window as an instance variable
+        self.main_page = self.window.get_main_page()
         self.window.show()
         self.app.exec()
 
@@ -40,11 +44,22 @@ class Visualizer:
 
         if isinstance(event, Quit):
             self.event_manager.unregister(self)
-            self.event_manager.post_event(EventManager.Quit("Visualizer is shutting down"))
+            self.window.close()
         elif isinstance(event, InitialEvent):
             self.initialize()
+        elif isinstance(event, TicketEvent):
+            pass
+
         pass
+
+    def update_main_page(self, main_page):
+        """
+
+        """
+        self.main_page = main_page
 
     def __str__(self):
         return "Visualizer"
 
+    def update_mini_map(self, mini_map_image):
+        self.main_page.mini_map.update_mini_map(mini_map_image)

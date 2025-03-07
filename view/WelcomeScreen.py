@@ -9,12 +9,12 @@ import os
 
 from view import MainPage
 
-
 class WelcomePage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Welcome")
         self.setGeometry(100, 100, 800, 600)
+        self.main_page = MainPage.MainPage()
 
         # Set up the menu bar with black text
         menu_bar = self.menuBar()
@@ -42,13 +42,10 @@ class WelcomePage(QMainWindow):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         background_path = os.path.join(base_dir, "view", "viewImage", "welcomeBackground.png")
 
-        if os.path.exists(background_path):
-            background_pixmap = QPixmap(background_path)
-            palette = QPalette()
-            palette.setBrush(QPalette.ColorRole.Window, QBrush(background_pixmap.scaled(self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)))
-            self.setPalette(palette)
-        else:
-            print(f"[Background Image Not Found at {background_path}]")
+        background_pixmap = QPixmap(background_path)
+        palette = QPalette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(background_pixmap.scaled(self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)))
+        self.setPalette(palette)
 
         # Layouts
         main_layout = QVBoxLayout()
@@ -135,9 +132,11 @@ class WelcomePage(QMainWindow):
         )
 
     def start_application(self):
-        self.main_page = MainPage.MapInterface()
         self.main_page.show()
         self.close()
+
+    def get_main_page(self):
+        return self.main_page
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
