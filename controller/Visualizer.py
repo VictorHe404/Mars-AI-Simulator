@@ -1,4 +1,3 @@
-from controller.ControllerSignals import ControllerSignals
 # from .EventManager import *
 import sys
 from PyQt6.QtCore import QObject
