@@ -1,13 +1,11 @@
 import sys
 import webbrowser
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QPushButton, QLabel, QMessageBox, QVBoxLayout, QWidget, QHBoxLayout, QMenuBar
+    QApplication, QMainWindow, QPushButton, QLabel, QMessageBox, QVBoxLayout, QWidget, QHBoxLayout
 )
-from PyQt6.QtGui import QPixmap, QAction, QPalette, QBrush
+from PyQt6.QtGui import QPixmap, QPalette, QBrush
 from PyQt6.QtCore import Qt, pyqtSignal
 import os
-
-from view import MainPage
 
 class WelcomePage(QMainWindow):
     start_signal = pyqtSignal()
@@ -16,24 +14,6 @@ class WelcomePage(QMainWindow):
         super().__init__()
         self.setWindowTitle("Mars AI - Welcome")
         self.setGeometry(100, 100, 800, 600)
-
-        # Set up the menu bar with black text
-        menu_bar = self.menuBar()
-        menu_bar.setStyleSheet("QMenuBar { color: black; font-size: 16px; } QMenu { color: black; font-size: 14px; }")
-
-        avatar_menu = menu_bar.addMenu("Avatar")
-
-        instruction_action = QAction("Instruction", self)
-        instruction_action.triggered.connect(self.show_instructions)
-        instruction_menu = menu_bar.addMenu("Instruction")
-        instruction_menu.addAction(instruction_action)
-
-        github_action = QAction("GitHub Link", self)
-        github_action.triggered.connect(self.open_github)
-        github_menu = menu_bar.addMenu("GitHub Link")
-        github_menu.addAction(github_action)
-
-        setting_menu = menu_bar.addMenu("Setting")
 
         # Central widget
         central_widget = QWidget()
@@ -45,7 +25,8 @@ class WelcomePage(QMainWindow):
 
         background_pixmap = QPixmap(background_path)
         palette = QPalette()
-        palette.setBrush(QPalette.ColorRole.Window, QBrush(background_pixmap.scaled(self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)))
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(background_pixmap.scaled(
+            self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)))
         self.setPalette(palette)
 
         # Layouts
@@ -116,6 +97,7 @@ class WelcomePage(QMainWindow):
         central_widget.setLayout(main_layout)
 
     def show_instructions(self):
+        """Display instructions for the application."""
         QMessageBox.information(
             self,
             "Instructions",
@@ -123,18 +105,22 @@ class WelcomePage(QMainWindow):
         )
 
     def open_github(self):
+        """Open the project's GitHub repository."""
         webbrowser.open("https://github.com/VictorHe404/COMP361")
 
     def show_about_us(self):
+        """Display information about the team."""
         QMessageBox.information(
             self,
             "About Us",
-            "Authors: Mars AI Team\\nContact: marsai@example.com"
+            "Authors: Mars AI Team\nContact: marsai@example.com"
         )
 
     def start_application(self):
+        """Emit the start signal to transition to the main application."""
         print("Starting application...")
         self.start_signal.emit()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

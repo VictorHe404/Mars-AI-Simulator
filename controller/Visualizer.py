@@ -11,7 +11,7 @@ class Visualizer(QObject):
     """
     # def __init__(self, event_manager: EventManager, signals) -> None
     # 暂时移除event manager，用于测试代码
-    def __init__(self, my_signals) -> None:
+    def __init__(self) -> None:
         super().__init__()
         # self.event_manager = event_manager
         # self.event_manager.register(self)
@@ -76,7 +76,5 @@ class Visualizer(QObject):
         return "Visualizer"
 
 if __name__ == "__main__":
-    signals = ControllerSignals()
-    visualizer = Visualizer(signals)
-    #
+    visualizer = Visualizer()
     visualizer.initialize()

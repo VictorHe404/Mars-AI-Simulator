@@ -1,7 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLineEdit, QHBoxLayout
 from PyQt6.QtCore import pyqtSignal
 
-
 class CommandPromptWidget(QWidget):
     command_signal = pyqtSignal(str)
 
