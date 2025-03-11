@@ -16,7 +16,7 @@ class BrainAStar(Brain):
         end = (self.current_task.des_row, self.current_task.des_col)
 
         self.detect_map = [[0 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
-        detection_mask = DetectionMask()
+        detection_mask = self.current_avatar.get_detection_mask()
 
         energy = self.current_avatar.battery_capacity
         max_energy = energy

@@ -1,6 +1,7 @@
 #import MapManager
 import glob
 import os
+import time
 from collections import deque
 
 import numpy as np
@@ -60,6 +61,7 @@ class Simulator:
         self.path_finding_counter = 0
 
         self.result_directory_path = "../result"
+        self.log_counter = 1
 
     def set_avatar(self, name):
         """
@@ -180,7 +182,7 @@ class Simulator:
             self.target_brain.set_environment(previous_brain.current_environment)
         else:
             # Follow the existing logic if no previous brain exists
-            if self.target_map.size != 0: # len(self.target_map) != 0
+            if len(self.target_map) != 0: # len(self.target_map) != 0
                 self.target_brain.set_original_map(self.target_map)
 
             if self.target_avatar is not None:
@@ -261,7 +263,7 @@ class Simulator:
         else:
 
             plt.show()
-
+    '''
     def save_log_to_file(self, filename="log.txt"):
         folder = os.path.join(self.result_directory_path)
         os.makedirs(folder, exist_ok=True)
@@ -285,8 +287,40 @@ class Simulator:
 
                 file.write("\n")
         print(f"Logs saved to {file_path}")
+    '''
+    def save_log_to_file(self):
+        folder = os.path.join(self.result_directory_path)
+        os.makedirs(folder, exist_ok=True)
 
-    def clear_directory(self,pattern="*"):
+        timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+
+        log_filename = f"log_{self.log_counter}_{timestamp}.txt"
+        file_path = os.path.join(folder, log_filename)
+
+        with open(file_path, "w") as file:
+            for log in self.result_trail:
+                file.write("\n")
+                file.write(
+                    f"Avatar Position: ({log.index_x}, {log.index_y}) | Time: {log.time} | Energy: {log.energy}\n"
+                )
+                file.write("Detection Map:\n")
+
+                for i, row in enumerate(log.detect_map):
+                    for j, value in enumerate(row):
+                        if i == log.index_x and j == log.index_y:
+                            file.write(f"({'{:.1f}'.format(value)}) ")
+                        else:
+                            file.write(f"{'*' if value == 114514 else '{:5.1f}'.format(value):>5} ")
+                    file.write("\n")
+
+                file.write("\n")
+
+        print(f"Logs saved to {file_path}")
+
+        self.log_counter += 1
+
+    def clear_directory(self, pattern="*.png"):
+
         files = glob.glob(os.path.join(self.result_directory_path, pattern))
         for f in files:
             try:
@@ -294,14 +328,6 @@ class Simulator:
                 print(f"File deleted: {f}")
             except Exception as e:
                 print(f"Cannot Delete file: {f}. error: {e}")
-
-#test code block:
-#simulator=Simulator()
-#simulator.set_map("100x100Louth_Crater_ice_mound_subPart")
-#print(simulator.target_map)
-#print(simulator.map_maxValue)
-#print(simulator.map_minValue)
-
 
 
 

@@ -29,7 +29,7 @@ class Brain(ABC):
 
     def is_ready_to_run(self):
 
-        if self.original_map.size == 0 or self.current_task is None or self.current_avatar is None or self.current_environment is None:
+        if len(self.original_map) == 0 or self.current_task is None or self.current_avatar is None or self.current_environment is None:
             return False
         return True
 
