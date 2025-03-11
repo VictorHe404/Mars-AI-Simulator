@@ -4,17 +4,18 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QLabel, QMessageBox, QVBoxLayout, QWidget, QHBoxLayout, QMenuBar
 )
 from PyQt6.QtGui import QPixmap, QAction, QPalette, QBrush
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 import os
 
 from view import MainPage
 
 class WelcomePage(QMainWindow):
+    start_signal = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Welcome")
         self.setGeometry(100, 100, 800, 600)
-        self.main_page = MainPage.MainPage()
 
         # Set up the menu bar with black text
         menu_bar = self.menuBar()
@@ -132,11 +133,8 @@ class WelcomePage(QMainWindow):
         )
 
     def start_application(self):
-        self.main_page.show()
-        self.close()
-
-    def get_main_page(self):
-        return self.main_page
+        print("Starting application...")
+        self.start_signal.emit()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -10,12 +10,11 @@ import os
 # --- Model ---
 class MapModel(QObject):
     avatar_position_changed = pyqtSignal(QPointF)
-    map_updated = pyqtSignal()
+    map_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.explored_areas = set()
-
 
 # --- View ---
 class MiniMapView(QGraphicsView):
@@ -31,7 +30,8 @@ class MiniMapView(QGraphicsView):
         self.setStyleSheet("border: 2px solid black;")
 
         # Mini map background
-        image_path = os.path.abspath("viewImage/miniMapDemo.png")
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(base_dir, "viewImage", "miniMapDemo.png")
         mini_map_background = QPixmap(image_path)
         mini_map_background = mini_map_background.scaled(self.mini_map_height-5, self.mini_map_width-5,
                                                          Qt.AspectRatioMode.KeepAspectRatio,
@@ -40,9 +40,6 @@ class MiniMapView(QGraphicsView):
         self.scene.addItem(self.background_item)
 
     def update_minimap(self, mini_map_image):
-        """
-
-        """
         mini_map_background = QPixmap(mini_map_image)
         self.background_item = QGraphicsPixmapItem(mini_map_background)
         self.scene.addItem(self.background_item)
@@ -55,11 +52,11 @@ class MainMapView(QGraphicsView):
         self.scene = QGraphicsScene()
         self.setScene(self.scene)
 
-        background_path = os.path.join(os.path.dirname(__file__), "view/viewImage/welcomeBackground.png")
-        if os.path.exists(background_path):
-            background_pixmap = QPixmap(background_path)
-            self.background_item = QGraphicsPixmapItem(background_pixmap)
-            self.scene.addItem(self.background_item)
+        # background_path = os.path.join(os.path.dirname(__file__), "view/viewImage/welcomeBackground.png")
+        # if os.path.exists(background_path):
+        #     background_pixmap = QPixmap(background_path)
+        #     self.background_item = QGraphicsPixmapItem(background_pixmap)
+        #     self.scene.addItem(self.background_item)
 
 # --- Controller ---
 class MapController(QObject):
@@ -67,9 +64,10 @@ class MapController(QObject):
         super().__init__()
         self.model = model
 
-
 # --- Main Application ---
 class MainPage(QMainWindow):
+    command_signal = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Map Interface")
@@ -85,7 +83,6 @@ class MainPage(QMainWindow):
         # Main layout
         main_widget = QWidget()
         main_layout = QVBoxLayout()
-
 
         # Navigation Taskbar (Replaces QTabWidget)
         taskbar_layout = QHBoxLayout()
@@ -121,39 +118,20 @@ class MainPage(QMainWindow):
         # Command terminal
         terminal_layout = QVBoxLayout()  # Vertical layout for proper alignment
 
-        activity_log = QTextEdit()
-        activity_log.setReadOnly(True)
-        activity_log.setFixedHeight(int(self.main_page_height/3))
-        activity_log.setStyleSheet("background-color: black; color: white; font-family: Consolas; font-size: 14px;")
+        self.activity_log = QTextEdit()
+        self.activity_log.setReadOnly(True)
+        self.activity_log.setFixedHeight(int(self.main_page_height / 3))
+        self.activity_log.setStyleSheet("background-color: black; color: white; font-family: Consolas; font-size: 14px;")
 
-        command_input = QLineEdit()
-        command_input.setStyleSheet("background-color: black; color: white; font-family: Consolas; font-size: 14px;")
-        command_input.setPlaceholderText("Type a command...")
+        self.command_input = QLineEdit()
+        self.command_input.setStyleSheet("background-color: black; color: white; font-family: Consolas; font-size: 14px;")
+        self.command_input.setPlaceholderText("Type a command...")
 
-        # Execute command function
-        def execute_command():
-            command = command_input.text().strip()
-            if command:
-                activity_log.append(f"C:\\> {command}")  # Simulate Windows CMD prompt
-                #process_command(command)  # Function to handle command execution
-                command_input.clear()  # Clear input after execution
+        self.command_input.returnPressed.connect(self.send_command)
 
-        # Handle key press (Enter to execute command)
-        command_input.returnPressed.connect(execute_command)
-
-        # # Function to simulate command execution
-        # def process_command(command):
-        #     if command.lower() == "clear":
-        #         activity_log.clear()  # Clear the output log
-        #     elif command.lower() == "exit":
-        #         activity_log.append("Exiting session...")
-        #     else:
-        #         activity_log.append(f"'{command}' is not recognized as an internal or external command.")
-
-
-        terminal_layout.addWidget(activity_log)
+        terminal_layout.addWidget(self.activity_log)
         input_layout = QHBoxLayout()
-        input_layout.addWidget(command_input)
+        input_layout.addWidget(self.command_input)
         terminal_layout.addLayout(input_layout)
 
         # Add all layouts
@@ -162,6 +140,16 @@ class MainPage(QMainWindow):
 
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+
+    def send_command(self):
+        command = self.command_input.text().strip()
+        if command:
+            self.command_signal.emit(command)
+            self.display_output(f"Command executed: {command}")
+            self.command_input.clear()  # Clear input after execution
+
+    def display_output(self, message):
+        self.activity_log.append(message)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
