@@ -1,4 +1,4 @@
-from controller.Signals import Signals
+from controller.ControllerSignals import ControllerSignals
 # from .EventManager import *
 import sys
 from PyQt6.QtCore import QObject
@@ -76,7 +76,7 @@ class Visualizer(QObject):
         return "Visualizer"
 
 if __name__ == "__main__":
-    signals = Signals()
+    signals = ControllerSignals()
     visualizer = Visualizer(signals)
     #
     visualizer.initialize()
