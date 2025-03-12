@@ -3,6 +3,7 @@ import glob
 import os
 import time
 from collections import deque
+from itertools import cycle
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +16,6 @@ from model.simulator.environment import Environment
 from model.simulator.task import Task
 from model.avatar import Avatar, DetectionMask,  Sensor
 import model.brain as Brain
-from model.test.integrated_test import off_db_avatar
 
 
 
@@ -219,8 +219,10 @@ class Simulator:
     def run(self):
         if self.target_brain.is_ready_to_run():
             self.clear_directory()
+            self.path_finding_counter = 0
             self.result_trail=self.target_brain.run()
             self.plot_results()
+            self.plot_full_map()
             self.save_log_to_file()
             return True
         else:
@@ -244,6 +246,7 @@ class Simulator:
                 avatar_positions=recent_positions,
                 save_path=save_path
             )
+            self.path_finding_counter += 1
 
 
     @staticmethod
@@ -258,15 +261,20 @@ class Simulator:
         ax.imshow(masked_data, cmap=cmap, norm=norm, origin='upper')
 
         if avatar_positions:
-            trail_colors = ['yellow', 'orange', 'orangered', 'red']
             num_positions = len(avatar_positions)
+            trail_colors = ['yellow', 'orange', 'orangered', 'red']
+            color_cycle = cycle(trail_colors)  # Create an infinite cycle of colors
+
+            # Inside the loop that plots the path:
             for i in range(1, num_positions):
                 start_pos = avatar_positions[i - 1]
                 end_pos = avatar_positions[i]
+                color = next(color_cycle)  # Get the next color in the cycle
+
                 ax.plot(
-                    [start_pos[1], end_pos[1]],
-                    [start_pos[0], end_pos[0]],
-                    color=trail_colors[i - 1],
+                    [start_pos[1], end_pos[1]],  # x-coordinates (columns)
+                    [start_pos[0], end_pos[0]],  # y-coordinates (rows)
+                    color=color,
                     linewidth=2
                 )
 
@@ -350,6 +358,31 @@ class Simulator:
                 print(f"File deleted: {f}")
             except Exception as e:
                 print(f"Cannot Delete file: {f}. error: {e}")
+
+    def plot_full_map(self):
+        """
+        Plot the full map with the original map's data and show the path from the result trail.
+        """
+        # Initialize deque to hold all points in the result trail (positions of the avatar)
+        all_positions = deque(maxlen=len(self.result_trail))
+
+        # Gather all positions from result trail to plot the path
+        for log in self.result_trail:
+            all_positions.append((log.get_index_x(), log.get_index_y()))  # Add position from each log entry
+
+        # Generate the full elevation map using the original map's data
+        save_path = os.path.join(self.result_directory_path, f'elevation_map_{self.path_finding_counter}.png')
+        print(f"Saving full elevation map to {save_path}")
+
+        Simulator.plot_elevation_map(
+            elevation_data=self.target_map,
+            min_val=self.map_minValue,
+            max_val=self.map_maxValue,
+            undetected_val=114514,
+            avatar_positions=all_positions,
+            save_path=save_path
+        )
+
 
 
 
