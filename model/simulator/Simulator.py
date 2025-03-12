@@ -171,8 +171,8 @@ class Simulator:
         match brain_name:
             case "greedy":
                 self.target_brain = Brain.BrainGreedy()
-            #case "astar":
-            #    self.target_brain = Brain.BrainAStar()
+            case "astar":
+                self.target_brain = Brain.BrainAStar()
 
         # If there was a previous brain, copy its fields to the new one
         if previous_brain is not None:
