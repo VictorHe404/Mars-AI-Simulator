@@ -40,6 +40,14 @@ class Visualizer(QObject):
             self.main_page.display_output(
                 "Hello, world!")
 
+        # command == "Create avatar a1"
+        # post command _> eVmanager
+        # parse->
+        # processed command -> evMAnager
+
+         # TODO 1: parse command
+        # TODO 2: initialize an avatar
+
     def initialize(self) -> None:
         """
         Initialize the Visualizer

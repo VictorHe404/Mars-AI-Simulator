@@ -42,39 +42,6 @@ class CommandEvent(ABC):
         raise NotImplementedError
 
 
-class _EventQueue:
-    """
-    the Event Queue helps EventManager manages the event
-    """
-    def __init__(self) -> None:
-        """Initialize an empty queue."""
-        self.queue = []
-
-    def push(self, item) -> None:
-        """Add an item to the end of the queue."""
-        self.queue.append(item)
-
-    def pop(self) -> Event:
-        """
-        Remove and return the front item of the queue.
-        Raises an error if the queue is empty.
-        """
-        if self.is_empty():
-            raise IndexError("Pop from an empty queue")
-        return self.queue.pop(0)
-
-    def is_empty(self) -> bool:
-        """Check if the queue is empty."""
-        return len(self.queue) == 0
-
-    def size(self) -> int:
-        """Return the number of elements in the queue."""
-        return len(self.queue)
-
-    def __str__(self):
-        """Return a string representation of the queue."""
-        return "Queue: " + " -> ".join(map(str, self.queue))
-
 class EventManager:
     """
     An event manager that receives, store and arrange the execution of the events
@@ -86,7 +53,6 @@ class EventManager:
         the Event manager will execute the event based on the
         first-come-first-serve basis
         """
-        self.event_queue = _EventQueue()
         self.subscribers = WeakSet()
 
     def register(self, subscriber) -> None:
@@ -105,17 +71,6 @@ class EventManager:
         """
         Post the event to the event manager
         """
-        self.event_queue.push(event)
-
-    def process_event(self) -> None:
-        """
-        Process the event in the event queue
-        """
-        if self.event_queue.is_empty():
-            print("No event to process")
-            return
-        event = self.event_queue.pop()
-
         for subscriber in self.subscribers:
             subscriber.notify(event)
 

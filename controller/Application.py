@@ -32,11 +32,7 @@ class Application:
         Run the application
         """
         self.event_manager.post_event(InitialEvent("Application is running"))
-        self.running = True
 
-        while self.running:
-            self.event_manager.process_event()
-            event = TicketEvent("Application is running")
 
     def __str__(self):
         return "Application"
