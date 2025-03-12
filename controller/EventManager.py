@@ -41,6 +41,14 @@ class CommandEvent(ABC):
         """
         raise NotImplementedError
 
+class ActionStatusEvent(Event):
+    """
+    Status Event with a boolean status and message
+    """
+    def __init__(self, status: bool, msg: str, action_name: str) -> None:
+        super().__init__(status, msg, action_name)
+
+
 
 class EventManager:
     """

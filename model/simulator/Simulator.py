@@ -7,6 +7,7 @@ from collections import deque
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from sympy import false
 
 from model.simulator.MapManager import MapManager
 from model.simulator.Log import Log
@@ -83,8 +84,11 @@ class Simulator:
 
             if self.target_brain:
                 self.target_brain.set_avatar(self.target_avatar)
+
+            return True
         else:
             print(f"Avatar '{name}' not found in database.")
+            return False
 
     def set_avatar_no_db(self, avatar_no_db:Avatar):
         self.target_avatar = avatar_no_db
@@ -141,9 +145,16 @@ class Simulator:
         Parameters:
         name(string): represent the map’s name in the map_names
         """
-        (self.target_map,self.map_minValue,self.map_maxValue)=self.map_manager.get_mapByName(name)
-        if self.target_brain is not None:
-            self.target_brain.set_map(self.target_map)
+        #(self.target_map,self.map_minValue,self.map_maxValue)=(self.map_manager.get_mapByName(name))
+
+        (t_map, t_min, t_max) = self.map_manager.get_mapByName(name)
+        if t_min == 0 and t_max == 0:
+            return False
+        else:
+            (self.target_map, self.map_minValue, self.map_maxValue) = (t_map, t_min, t_max)
+            if self.target_brain is not None:
+                self.target_brain.set_map(self.target_map)
+            return True
 
     def set_task(self,s_row,s_col,d_row, d_col) :
         """
@@ -154,9 +165,13 @@ class Simulator:
         d_row(int) :des_row
         d_col(int) :des_col
         """
+        if not (0 <= s_row < 100 and 0 <= s_col < 100 and 0 <= d_row < 100 and 0 <= d_col < 100):
+            return False
+
         self.target_task=Task(s_row,s_col,d_row,d_col)
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
+        return True
 
     def get_brain_names(self):
         """
@@ -173,6 +188,10 @@ class Simulator:
                 self.target_brain = Brain.BrainGreedy()
             case "astar":
                 self.target_brain = Brain.BrainAStar()
+            case _:
+                return False
+
+
 
         # If there was a previous brain, copy its fields to the new one
         if previous_brain is not None:
@@ -193,6 +212,7 @@ class Simulator:
 
             if self.target_environment is not None:
                 self.target_brain.set_environment(self.target_environment)
+        return True
 
 
 
@@ -202,8 +222,10 @@ class Simulator:
             self.result_trail=self.target_brain.run()
             self.plot_results()
             self.save_log_to_file()
+            return True
         else:
             print("The target brain is not ready yet")
+            return False
 
     def plot_results(self):
         recent_positions = deque(maxlen=4)
