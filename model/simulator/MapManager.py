@@ -44,7 +44,7 @@ class MapManager:
         #self.map_path+name+".tif"
         if (name not in self.map_names) :
             print("the map you want is not in the map_names")
-            return (np.empty((0,0)),0,0)
+            return (np.empty((0,0)),-10000,-10000)
 
         map_array=self.read_tif_to_array(file_path)
         max_value = np.max(map_array)

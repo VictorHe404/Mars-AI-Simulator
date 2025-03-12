@@ -61,7 +61,7 @@ class Simulator:
 
         self.path_finding_counter = 0
 
-        self.result_directory_path = "../result"
+        self.result_directory_path = "../cache_directory"
         self.log_counter = 1
 
     def set_avatar(self, name):
@@ -148,7 +148,7 @@ class Simulator:
         #(self.target_map,self.map_minValue,self.map_maxValue)=(self.map_manager.get_mapByName(name))
 
         (t_map, t_min, t_max) = self.map_manager.get_mapByName(name)
-        if t_min == 0 and t_max == 0:
+        if t_min == -10000 and t_max == -10000:
             return False
         else:
             (self.target_map, self.map_minValue, self.map_maxValue) = (t_map, t_min, t_max)
@@ -248,7 +248,7 @@ class Simulator:
 
     @staticmethod
     def plot_elevation_map(elevation_data, min_val, max_val, undetected_val, avatar_positions=None,
-                           save_path='../result/elevation_map.png'):
+                           save_path='../cache_directory/elevation_map.png'):
 
         masked_data = np.ma.masked_where(elevation_data == undetected_val, elevation_data)
         cmap = plt.get_cmap('terrain')

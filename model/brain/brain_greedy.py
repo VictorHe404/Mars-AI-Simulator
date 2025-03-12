@@ -32,7 +32,7 @@ class BrainGreedy(Brain):
         # Start running the simulation
         while (x, y) != (end_x, end_y):
 
-            # Used to show the result clearer
+            # Used to show the cache_directory clearer
             #Time.sleep(1)
 
             # Apply the detection mask

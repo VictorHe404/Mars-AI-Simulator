@@ -95,6 +95,16 @@ class SimulatorManager:
                 ActionStatusEvent(is_set, success_message, "set_brain"))
 
     def run_simulator(self) -> None:
+        is_running = self.simulator.run()
+        if not is_running:
+            error_message = "Simulator failed to start due to unset elements."
+            self.event_manager.post_event(
+                ActionStatusEvent(is_running, error_message, "run_simulator"))
+        else:
+            success_message = "Simulator finished successfully."
+            self.event_manager.post_event(
+                ActionStatusEvent(is_running, success_message, "run_simulator"))
+
 
 
 
