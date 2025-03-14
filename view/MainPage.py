@@ -56,11 +56,8 @@ class MainPage(QMainWindow):
         self.setCentralWidget(main_widget)
 
     def process_command(self, command):
-        """Process commands from the command prompt."""
-        self.display_output(f"Processing command: {command}")
-        # Example of custom command handling
-        if command == "hello":
-            self.display_output("Hello, Mars AI!")
+        """Emit the command to Visualizer."""
+        self.command_signal.emit(command)
 
     def display_output(self, message):
         """Display output in the command prompt's activity log."""

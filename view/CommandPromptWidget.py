@@ -41,7 +41,7 @@ class CommandPromptWidget(QWidget):
         command = self.command_input.text().strip()
         if command:
             self.command_signal.emit(command)
-            self.display_output(f"Command executed: {command}")
+            # self.display_output(f"Command executed: {command}")
             self.command_input.clear()
 
     def display_output(self, message):

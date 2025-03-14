@@ -1,6 +1,8 @@
-# from .EventManager import *
+from .EventManager import *
 import sys
 from PyQt6.QtCore import QObject
+
+from controller.EventManager import EventManager
 from view.WelcomeScreen import *
 from view.MainPage import *
 
@@ -8,21 +10,16 @@ class Visualizer(QObject):
     """
     Visualizer: visualize the event
     """
-    # def __init__(self, event_manager: EventManager, signals) -> None
-    # 暂时移除event manager，用于测试代码
-    def __init__(self) -> None:
+    def __init__(self, event_manager: EventManager) -> None:
         super().__init__()
-        # self.event_manager = event_manager
-        # self.event_manager.register(self)
-        # Initialize instance variables to None
-        # self.app: QApplication | None = None
-        # self.window: WelcomePage | None = None
+        self.event_manager = event_manager
+        self.event_manager.register(self)
         print("Visualizer is registered")
         self.app = QApplication(sys.argv)
         self.window = WelcomePage()
         self.main_page = MainPage()
         self.window.start_signal.connect(self.on_start)
-        self.main_page.command_signal.connect(self.excute_command)
+        self.main_page.command_signal.connect(self.execute_command)
 
     def on_start(self):
         """
@@ -32,21 +29,13 @@ class Visualizer(QObject):
         self.window.close()
         self.main_page.show()
 
-    def excute_command(self, command):
+    def execute_command(self, command: str) -> None:
         """
         Function to execute the command, and display the output
         """
-        if command == "hello":
-            self.main_page.display_output(
-                "Hello, world!")
+        # post the command to EventManager so that KeyboardController can parse it
+        self.event_manager.post_event(CommandEvent(command))
 
-        # command == "Create avatar a1"
-        # post command _> eVmanager
-        # parse->
-        # processed command -> evMAnager
-
-         # TODO 1: parse command
-        # TODO 2: initialize an avatar
 
     def initialize(self) -> None:
         """
@@ -61,27 +50,20 @@ class Visualizer(QObject):
         self.window.show()
         sys.exit(self.app.exec())
 
-    # def notify(self, event: Event) -> None:
-    #     """
-    #     Notify the listener with the given event
-    #     #### Message to Victor He: your visualizer should receive the CommandEvent
-    #     and them visualize the command
-    #     """
-    #     print(f"Visualizer received: {event}")
-    #
-    #     if isinstance(event, Quit):
-    #         self.event_manager.unregister(self)
-    #         self.window.close()
-    #     elif isinstance(event, InitialEvent):
-    #         self.initialize()
-    #     elif isinstance(event, TicketEvent):
-    #         pass
-    #
-    #     pass
+    def notify(self, event: Event) -> None:
+        """
+        Notify the listener with the given event
+        """
+        if isinstance(event, Quit):
+            self.event_manager.unregister(self)
+            self.window.close()
+        elif isinstance(event, InitialEvent):
+            self.initialize()
+        elif isinstance(event, ActionStatusEvent):
+            print("status message",event.msg)
+            self.main_page.display_output(event.msg)
 
     def __str__(self):
         return "Visualizer"
 
-if __name__ == "__main__":
-    visualizer = Visualizer()
-    visualizer.initialize()
+

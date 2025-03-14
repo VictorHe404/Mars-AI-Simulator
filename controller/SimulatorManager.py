@@ -1,6 +1,6 @@
 from xmlrpc.client import boolean
 
-from ..model.simulator import *
+from model.simulator import *
 from .EventManager import *
 
 class SimulatorManager:
@@ -19,10 +19,32 @@ class SimulatorManager:
         if isinstance(event, Quit):
             self.event_manager.unregister(self)
         elif isinstance(event, InitialEvent):
-            self.simulator.initialize()
-        elif isinstance(event, TicketEvent):
-             if TicketEvent.msg == "Create avatar a1":
-                    self.simulator.create_avatar("a1")
+            # self.simulator.initialize()
+            pass
+        elif isinstance(event, SimulatorEvent):
+            print("SimulatorManager received SimulatorEvent")
+            command = event.cmd
+            print(f"SimulatorManager received: {command}")
+            if command["command"] == "cavatar":
+                print("SimulatorManager received create_avatar command")
+                self.create_avatar(command["avatar_name"])
+            elif command["command"] == "savatar":
+                print("SimulatorManager received set_avatar command")
+                self.set_avatar(command["avatar_name"])
+            elif command["command"] == "smap":
+                print("SimulatorManager received set_map command")
+                self.set_map(command["map_name"])
+            elif command["command"] == "sbrain":
+                print("SimulatorManager received set_brain command")
+                self.set_brain(command["brain_name"])
+            elif command["command"] == "move":
+                print("SimulatorManager received move command")
+                self.set_task(command["target"][0], command["target"][1], command["target"][2], command["target"][3])
+                self.run_simulator()
+
+
+
+
 
 
 

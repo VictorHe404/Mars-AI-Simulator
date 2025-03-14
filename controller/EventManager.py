@@ -28,6 +28,13 @@ class TicketEvent(Event):
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
+class SimulatorEvent(Event):
+    """
+    Simulator Event
+    """
+    def __init__(self, cmd: dict[str, str]) -> None:
+        self.cmd = cmd
+
 class CommandEvent(ABC):
     """
     Super class of Command Event
@@ -35,18 +42,15 @@ class CommandEvent(ABC):
     def __init__(self, command: str) -> None:
         self.command = command
 
-    def parse_command(self) -> list[str]:
-        """
-        parse the given command into executable pieces
-        """
-        raise NotImplementedError
 
 class ActionStatusEvent(Event):
     """
     Status Event with a boolean status and message
     """
     def __init__(self, status: bool, msg: str, action_name: str) -> None:
-        super().__init__(status, msg, action_name)
+        self.status = status
+        self.msg = msg
+        self.action_name = action_name
 
 
 

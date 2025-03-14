@@ -1,6 +1,7 @@
 from .EventManager import *
-from .KeyboardController import KeyboardController
+from .CommandController import CommandController
 from .Visualizer import Visualizer
+from .SimulatorManager import *
 
 
 class Application:
@@ -10,8 +11,9 @@ class Application:
     def __init__(self) -> None:
         self.running = False
         self.event_manager = EventManager()
-        self.keyboard_controller = KeyboardController(self.event_manager)
+        self.keyboard_controller = CommandController(self.event_manager)
         self.visualizer = Visualizer(self.event_manager)
+        self.simulator_manager = SimulatorManager(self.event_manager)
 
     def notify(self, event: Event) -> None:
         """
