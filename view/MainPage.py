@@ -20,11 +20,16 @@ class MainPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Map Interface")
-        self.main_page_height = 800
-        self.main_page_width = 1200
+        # Get screen size
+        screen = QApplication.primaryScreen()
+        rect = screen.availableGeometry()
 
-        self.setGeometry(100, 100, self.main_page_width, self.main_page_height)
+        # Dynamically set width and height based on screen size (90% of screen size)
+        self.main_page_width = int(rect.width()*0.5)
+        self.main_page_height = int(rect.height()*0.5)
 
+        # Set the geometry of the window
+        self.setGeometry(50, 50, self.main_page_width, self.main_page_height)
         # Model and Controller
         self.model = MapModel()
 
