@@ -4,6 +4,7 @@ from model.simulator import *
 from .EventManager import *
 
 class SimulatorManager:
+
     def __init__(self, event_manager: EventManager) -> None:
         self.event_manager = event_manager
         self.event_manager.register(self)
@@ -39,14 +40,9 @@ class SimulatorManager:
                 self.set_brain(command["brain_name"])
             elif command["command"] == "move":
                 print("SimulatorManager received move command")
-                self.set_task(command["target"][0], command["target"][1], command["target"][2], command["target"][3])
+                self.set_task(command["target"][0], command["target"][1],
+                              command["target"][2], command["target"][3])
                 self.run_simulator()
-
-
-
-
-
-
 
     def initialize(self, avatar_name: str | None) -> None:
         """
@@ -95,7 +91,8 @@ class SimulatorManager:
                 ActionStatusEvent(is_set, success_message, "set_map"))
 
     def set_task(self, start_row, start_col, destination_row, destination_col) -> None:
-        is_set = self.simulator.set_task(start_row, start_col, destination_row, destination_col)
+        is_set = self.simulator.set_task(start_row, start_col,
+                                         destination_row, destination_col)
         if not is_set:
             error_message = "Task set failed due to invalid coordinates."
             self.event_manager.post_event(
@@ -126,16 +123,3 @@ class SimulatorManager:
             success_message = "Simulator finished successfully."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, success_message, "run_simulator"))
-
-
-
-
-
-
-
-
-
-
-
-
-
