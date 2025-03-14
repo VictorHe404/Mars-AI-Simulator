@@ -1,6 +1,10 @@
 import math
+import os
 import sqlite3
 import uuid
+
+from plotly.validators.layout.slider.transition import DurationValidator
+
 from model.avatar.database import DB_NAME
 from model.avatar.sensor import Sensor
 from model.avatar.detection_mask import DetectionMask
@@ -50,7 +54,17 @@ class Avatar:
         """
         Save this Avatar to the database as a new record.
         """
+        print(DB_NAME)
+        if os.path.exists(DB_NAME):
+            print(f"Database found: {DB_NAME}")
         if self.database_available:
+            with sqlite3.connect(DB_NAME) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Avatar'")
+                result = cursor.fetchone()
+                print("Table exists:", result)
+
+            print("11")
             query = '''
                 INSERT INTO Avatar (id, name, weight, material, description,
                                     battery_capacity, battery_consumption_rate,
@@ -58,15 +72,39 @@ class Avatar:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             '''
             params = (
-                self.id, self.name, self.weight, self.material, self.description,
-                self.battery_capacity, self.battery_consumption_rate,
-                self.driving_force, self.speed, self.energy_recharge_rate
+                str(self.id),  # Ensure ID is a string
+                str(self.name),  # Ensure Name is a string
+                float(self.weight) if self.weight is not None else None,  # Ensure float or None
+                str(self.material),  # Ensure Material is a string
+                str(self.description),  # Ensure Description is a string
+                float(self.battery_capacity) if self.battery_capacity is not None else None,
+                float(self.battery_consumption_rate) if self.battery_consumption_rate is not None else None,
+                float(self.driving_force) if self.driving_force is not None else None,
+                float(self.speed) if self.speed is not None else None,
+                float(self.energy_recharge_rate) if self.energy_recharge_rate is not None else None
             )
+            print(query)
+
+            # Labels for each attribute
+            attributes = [
+                "ID", "Name", "Weight", "Material", "Description",
+                "Battery Capacity", "Battery Consumption Rate",
+                "Driving Force", "Speed", "Energy Recharge Rate"
+            ]
+
+            # Print in a formatted way
+            print("Avatar Characteristics:")
+            for attr, value in zip(attributes, params):
+                print(f"{attr}: {value}")
 
             with sqlite3.connect(DB_NAME) as conn:
+                print("22")
                 cursor = conn.cursor()
+                print("44")
                 cursor.execute(query, params)
+                print("55")
                 conn.commit()
+                print("33")
 
     @staticmethod
     def get_all_avatar_names():
@@ -108,17 +146,22 @@ class Avatar:
 
     @staticmethod
     def get_avatar_by_name(name):
+        print(DB_NAME)
         """
         Retrieve an Avatar instance from the database by name.
         :param name: The unique name of the Avatar.
         :return: Avatar instance if found, else None.
         """
         query = "SELECT * FROM Avatar WHERE name = ?"
+        print("1")
+        if os.path.exists(DB_NAME):
+            print(f"Database found: {DB_NAME}")
         with sqlite3.connect(DB_NAME) as conn:
+            print("3")
             cursor = conn.cursor()
             cursor.execute(query, (name,))
             row = cursor.fetchone()
-
+        print("2")
         if row:
             return Avatar(
                 name=row[1], weight=row[2], material=row[3], description=row[4],

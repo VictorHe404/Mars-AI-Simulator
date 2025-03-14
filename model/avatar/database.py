@@ -1,13 +1,21 @@
 import sqlite3
+import os
+#ROOT_DIR = os.path.abspath(os.path.dirname(__file__), "..", "..")  # Adjust this based on your main script location
 
+# Construct the absolute path to the database
+#DB_NAME = os.path.join(ROOT_DIR, "avatar.db")
+DB_INITIALIZE_NAME = "C:/Users/Justi/OneDrive/文档/GitHub/COMP361/avatar.db"
 DB_NAME = "avatar.db"
+#DB_NAME = "avatar.db"
 
 def init_db():
     """
     Initialize the database with the required tables: Avatar, Sensor, and AvatarSensor.
     Ensures unique constraints on id and name for both Avatar and Sensor.
     """
-    conn = sqlite3.connect(DB_NAME)
+    #print(ROOT_DIR)
+    print(DB_INITIALIZE_NAME)
+    conn = sqlite3.connect(DB_INITIALIZE_NAME)
     cursor = conn.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS Avatar")

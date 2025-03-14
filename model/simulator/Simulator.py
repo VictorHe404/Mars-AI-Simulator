@@ -117,13 +117,16 @@ class Simulator:
             print("Error: Avatar name cannot be empty.")
             return False
 
+        print("The name check is passed")
         existing_avatar = Avatar.get_avatar_by_name(name)
+        print("The avatar.get is passed")
         if existing_avatar:
             print(f"Avatar '{name}' already exists in the database.")
             return False
 
+        print("Avatar check is passed")
         default_avatar = Avatar.get_default_avatar(name)
-
+        print("The default avatar.get is passed")
         new_avatar = Avatar(
             name=name,
             weight=default_avatar.weight,
@@ -139,6 +142,8 @@ class Simulator:
         )
 
         new_avatar.save_to_db()
+
+        print("The new avatar.save to db is passed")
 
         for sensor in default_avatar.sensors:
             new_avatar.bind_sensor(sensor)
