@@ -180,6 +180,8 @@ class Simulator:
         """
         return self.brain_list
 
+
+    # Set the brain
     def set_brain(self, brain_name):
         previous_brain = self.target_brain  # Store reference to the current brain if exists
 
@@ -192,15 +194,12 @@ class Simulator:
                 return False
 
 
-
-        # If there was a previous brain, copy its fields to the new one
         if previous_brain is not None:
             self.target_brain.set_original_map(previous_brain.original_map)
             self.target_brain.set_avatar(previous_brain.current_avatar)
             self.target_brain.set_task(previous_brain.current_task)
             self.target_brain.set_environment(previous_brain.current_environment)
         else:
-            # Follow the existing logic if no previous brain exists
             if len(self.target_map) != 0: # len(self.target_map) != 0
                 self.target_brain.set_original_map(self.target_map)
 
@@ -215,7 +214,7 @@ class Simulator:
         return True
 
 
-
+    # Run the simulation and generate the results
     def run(self):
         if self.target_brain.is_ready_to_run():
             self.clear_directory()
@@ -229,6 +228,8 @@ class Simulator:
             print("The target brain is not ready yet")
             return False
 
+
+    # The overall function to plot the result
     def plot_results(self):
         recent_positions = deque(maxlen=4)
 
@@ -249,6 +250,7 @@ class Simulator:
             self.path_finding_counter += 1
 
 
+    # Plot the result log in the format of elevation map
     @staticmethod
     def plot_elevation_map(elevation_data, min_val, max_val, undetected_val, avatar_positions=None,
                            save_path='../cache_directory/elevation_map.png'):
@@ -263,17 +265,16 @@ class Simulator:
         if avatar_positions:
             num_positions = len(avatar_positions)
             trail_colors = ['yellow', 'orange', 'orangered', 'red']
-            color_cycle = cycle(trail_colors)  # Create an infinite cycle of colors
+            color_cycle = cycle(trail_colors)
 
-            # Inside the loop that plots the path:
             for i in range(1, num_positions):
                 start_pos = avatar_positions[i - 1]
                 end_pos = avatar_positions[i]
-                color = next(color_cycle)  # Get the next color in the cycle
+                color = next(color_cycle)
 
                 ax.plot(
-                    [start_pos[1], end_pos[1]],  # x-coordinates (columns)
-                    [start_pos[0], end_pos[0]],  # y-coordinates (rows)
+                    [start_pos[1], end_pos[1]],
+                    [start_pos[0], end_pos[0]],
                     color=color,
                     linewidth=2
                 )
@@ -293,31 +294,9 @@ class Simulator:
         else:
 
             plt.show()
-    '''
-    def save_log_to_file(self, filename="log.txt"):
-        folder = os.path.join(self.result_directory_path)
-        os.makedirs(folder, exist_ok=True)
 
-        file_path = os.path.join(folder, filename)
 
-        with open(file_path, "w") as file:
-            for log in self.result_trail:
-                file.write("\n")
-                file.write(
-                    f"Avatar Position: ({log.index_x}, {log.index_y}) | Time: {log.time} | Energy: {log.energy}\n")
-                file.write("Detection Map:\n")
-
-                for i, row in enumerate(log.detect_map):
-                    for j, value in enumerate(row):
-                        if i == log.index_x and j == log.index_y:
-                            file.write(f"({'{:.1f}'.format(value)}) ")
-                        else:
-                            file.write(f"{'*' if value == 114514 else '{:5.1f}'.format(value):>5} ")
-                    file.write("\n")
-
-                file.write("\n")
-        print(f"Logs saved to {file_path}")
-    '''
+    # Save the result to a log file
     def save_log_to_file(self):
         folder = os.path.join(self.result_directory_path)
         os.makedirs(folder, exist_ok=True)
@@ -349,6 +328,8 @@ class Simulator:
 
         self.log_counter += 1
 
+
+    # Clear the cash directory
     def clear_directory(self, pattern="*.png"):
 
         files = glob.glob(os.path.join(self.result_directory_path, pattern))
@@ -359,18 +340,12 @@ class Simulator:
             except Exception as e:
                 print(f"Cannot Delete file: {f}. error: {e}")
 
+
+    # Plot the full path after the simulation
     def plot_full_map(self):
-        """
-        Plot the full map with the original map's data and show the path from the result trail.
-        """
-        # Initialize deque to hold all points in the result trail (positions of the avatar)
         all_positions = deque(maxlen=len(self.result_trail))
-
-        # Gather all positions from result trail to plot the path
         for log in self.result_trail:
-            all_positions.append((log.get_index_x(), log.get_index_y()))  # Add position from each log entry
-
-        # Generate the full elevation map using the original map's data
+            all_positions.append((log.get_index_x(), log.get_index_y()))
         save_path = os.path.join(self.result_directory_path, f'elevation_map_{self.path_finding_counter}.png')
         print(f"Saving full elevation map to {save_path}")
 
