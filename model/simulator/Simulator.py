@@ -106,37 +106,43 @@ class Simulator:
         return Avatar.get_all_avatar_names()
 
     @staticmethod
-    def add_avatar(name=None):
+    def add_avatar(name):
         """
-        Add a new Avatar to the database if it does not already exist.
+        Add a new Avatar to the database using the default Avatar parameters but with a specified name.
+
         :param name: The unique name of the new Avatar.
         :return: Boolean indicating success or failure.
         """
-        if name is None:
-            from model.test.integrated_test import off_db_avatar
-            name = off_db_avatar.name
+        if not name:
+            print("Error: Avatar name cannot be empty.")
+            return False
+
         existing_avatar = Avatar.get_avatar_by_name(name)
         if existing_avatar:
             print(f"Avatar '{name}' already exists in the database.")
             return False
-
-        # Create a new Avatar instance and save it to the database
+        default_avatar = Avatar.get_default_avatar()
         new_avatar = Avatar(
             name=name,
-            weight=75.0,  # Default values (can be modified later)
-            material="Unknown",
-            description="New Avatar",
-            battery_capacity=1000.0,
-            battery_consumption_rate=10.0,
-            driving_force=50.0,
-            speed=2.0,
-            energy_recharge_rate=5.0,
-            sensors=[]
+            weight=default_avatar.weight,
+            material=default_avatar.material,
+            description=default_avatar.description,
+            battery_capacity=default_avatar.battery_capacity,
+            battery_consumption_rate=default_avatar.battery_consumption_rate,
+            driving_force=default_avatar.driving_force,
+            speed=default_avatar.speed,
+            energy_recharge_rate=default_avatar.energy_recharge_rate,
+            sensors=[],
+            database_available=True
         )
-        new_avatar.save_to_db()
-        print(f"New Avatar '{name}' added successfully.")
-        return True
 
+        new_avatar.save_to_db()
+
+        for sensor in default_avatar.sensors:
+            new_avatar.bind_sensor(sensor)
+
+        print(f"New Avatar '{name}' added successfully with default sensors.")
+        return True
 
     def set_map(self, name:str):
         """

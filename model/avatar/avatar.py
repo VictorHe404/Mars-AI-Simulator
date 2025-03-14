@@ -5,6 +5,7 @@ from model.avatar.database import DB_NAME
 from model.avatar.sensor import Sensor
 from model.avatar.detection_mask import DetectionMask
 
+
 class Avatar:
     def __init__(self, name, weight, material, description,
                  battery_capacity, battery_consumption_rate,
@@ -314,6 +315,35 @@ class Avatar:
         print(f"Max Slope: {self.max_slope} degrees")
         print(f"Energy Recharge Rate: {self.energy_recharge_rate} mAh/s")
 
+    @classmethod
+    def get_default_avatar(cls):
+        """
+        Returns a default Avatar instance that can be used globally.
+        This method ensures the avatar is only created when needed.
+        """
+        radar_sensor = Sensor(
+            name="Radar-360",
+            range_=5,
+            fov=360,
+            battery_consumption=2,
+            description="A full-range radar sensor providing 360-degree vision.",
+            direction=0,
+            database_available=False
+        )
+
+        return cls(
+            name="Mars Explorer X",
+            weight=80,
+            material="Titanium Alloy",
+            description="A high-endurance avatar designed for Mars exploration.",
+            battery_capacity=200,
+            battery_consumption_rate=5,
+            driving_force=280,
+            speed=1,
+            energy_recharge_rate=20,
+            sensors=[radar_sensor],
+            database_available=False
+        )
 
 
     def get_name(self):
@@ -332,3 +362,4 @@ class Avatar:
         return self.max_slope
     def get_energy_recharge_rate(self):
         return self.energy_recharge_rate
+
