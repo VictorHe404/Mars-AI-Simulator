@@ -316,26 +316,26 @@ class Avatar:
         print(f"Energy Recharge Rate: {self.energy_recharge_rate} mAh/s")
 
     @classmethod
-    def get_default_avatar(cls):
+    def get_default_avatar(cls, avatar_name):
         """
-        Returns a default Avatar instance that can be used globally.
-        This method ensures the avatar is only created when needed.
+        Returns a default Avatar instance with a unique sensor name based on the avatar name.
+        This prevents name collisions for sensors when multiple avatars are created.
         """
         radar_sensor = Sensor(
-            name="Radar-360",
+            name=f"{avatar_name}_Radar-360",
             range_=5,
             fov=360,
             battery_consumption=2,
-            description="A full-range radar sensor providing 360-degree vision.",
+            description=f"Radar sensor for {avatar_name}, providing 360-degree vision.",
             direction=0,
             database_available=False
         )
 
         return cls(
-            name="Mars Explorer X",
+            name=avatar_name,
             weight=80,
             material="Titanium Alloy",
-            description="A high-endurance avatar designed for Mars exploration.",
+            description=f"A high-endurance avatar named {avatar_name} for Mars exploration.",
             battery_capacity=200,
             battery_consumption_rate=5,
             driving_force=280,
@@ -344,7 +344,6 @@ class Avatar:
             sensors=[radar_sensor],
             database_available=False
         )
-
 
     def get_name(self):
         return self.name

@@ -121,7 +121,9 @@ class Simulator:
         if existing_avatar:
             print(f"Avatar '{name}' already exists in the database.")
             return False
-        default_avatar = Avatar.get_default_avatar()
+
+        default_avatar = Avatar.get_default_avatar(name)
+
         new_avatar = Avatar(
             name=name,
             weight=default_avatar.weight,
@@ -141,7 +143,7 @@ class Simulator:
         for sensor in default_avatar.sensors:
             new_avatar.bind_sensor(sensor)
 
-        print(f"New Avatar '{name}' added successfully with default sensors.")
+        print(f"New Avatar '{name}' added successfully with a unique sensor '{default_avatar.sensors[0].name}'.")
         return True
 
     def set_map(self, name:str):
