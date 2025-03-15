@@ -8,7 +8,7 @@ from plotly.validators.layout.slider.transition import DurationValidator
 from model.avatar.database import DB_NAME
 from model.avatar.sensor import Sensor
 from model.avatar.detection_mask import DetectionMask
-
+from model.avatar.database import init_db
 
 class Avatar:
     def __init__(self, name, weight, material, description,
@@ -50,19 +50,26 @@ class Avatar:
             for sensor in self.sensors:
                 self.bind_sensor(sensor)
 
+
     def save_to_db(self):
         """
         Save this Avatar to the database as a new record.
         """
         print(DB_NAME)
+
         if os.path.exists(DB_NAME):
             print(f"Database found: {DB_NAME}")
+
         if self.database_available:
             with sqlite3.connect(DB_NAME) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Avatar'")
                 result = cursor.fetchone()
                 print("Table exists:", result)
+
+                if not result:
+                    print("Error: Table 'Avatar' does not exist. Try running init_db().")
+                    return
 
             print("11")
             query = '''
@@ -72,41 +79,49 @@ class Avatar:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             '''
             params = (
-                str(self.id),  # Ensure ID is a string
-                str(self.name),  # Ensure Name is a string
-                float(self.weight) if self.weight is not None else None,  # Ensure float or None
-                str(self.material),  # Ensure Material is a string
-                str(self.description),  # Ensure Description is a string
-                float(self.battery_capacity) if self.battery_capacity is not None else None,
-                float(self.battery_consumption_rate) if self.battery_consumption_rate is not None else None,
-                float(self.driving_force) if self.driving_force is not None else None,
-                float(self.speed) if self.speed is not None else None,
-                float(self.energy_recharge_rate) if self.energy_recharge_rate is not None else None
+                str(self.id),
+                str(self.name),
+                float(self.weight) if self.weight is not None else 0.0,
+                str(self.material),
+                str(self.description),
+                float(self.battery_capacity) if self.battery_capacity is not None else 0.0,
+                float(self.battery_consumption_rate) if self.battery_consumption_rate is not None else 0.0,
+                float(self.driving_force) if self.driving_force is not None else 0.0,
+                float(self.speed) if self.speed is not None else 0.0,
+                float(self.energy_recharge_rate) if self.energy_recharge_rate is not None else 0.0
             )
-            print(query)
 
-            # Labels for each attribute
-            attributes = [
+            print(query)
+            print("Avatar Characteristics:")
+            for attr, value in zip([
                 "ID", "Name", "Weight", "Material", "Description",
                 "Battery Capacity", "Battery Consumption Rate",
                 "Driving Force", "Speed", "Energy Recharge Rate"
-            ]
-
-            # Print in a formatted way
-            print("Avatar Characteristics:")
-            for attr, value in zip(attributes, params):
+            ], params):
                 print(f"{attr}: {value}")
 
-            with sqlite3.connect(DB_NAME) as conn:
-                print("22")
-                cursor = conn.cursor()
-                print("44")
+            try:
+                with sqlite3.connect(DB_NAME) as conn:
+                    print("22")
+                    cursor = conn.cursor()
 
-                # Cause error
-                cursor.execute(query, params)
-                print("55")
-                conn.commit()
-                print("33")
+                    # Debug: Check for duplicate names
+                    cursor.execute("SELECT * FROM Avatar WHERE name=?", (self.name,))
+                    existing = cursor.fetchone()
+                    if existing:
+                        print(f"Avatar '{self.name}' already exists, deleting old entry.")
+                        cursor.execute("DELETE FROM Avatar WHERE name=?", (self.name,))
+                        conn.commit()
+
+                    cursor.execute(query, params)
+                    conn.commit()
+                    print("Data inserted successfully.")
+            except sqlite3.IntegrityError as e:
+                print(f"Database Integrity Error: {e}")
+            except sqlite3.OperationalError as e:
+                print(f"SQLite Operational Error: {e}")
+            except Exception as e:
+                print(f"Unexpected Error: {e}")
 
     @staticmethod
     def get_all_avatar_names():
@@ -360,8 +375,9 @@ class Avatar:
         print(f"Max Slope: {self.max_slope} degrees")
         print(f"Energy Recharge Rate: {self.energy_recharge_rate} mAh/s")
 
+
     @classmethod
-    def get_default_avatar(cls, avatar_name):
+    def get_default_avatar(cls, avatar_name, database_available=True):
         """
         Returns a default Avatar instance with a unique sensor name based on the avatar name.
         This prevents name collisions for sensors when multiple avatars are created.
@@ -373,7 +389,7 @@ class Avatar:
             battery_consumption=2,
             description=f"Radar sensor for {avatar_name}, providing 360-degree vision.",
             direction=0,
-            database_available=False
+            database_available=database_available
         )
 
         return cls(
@@ -387,7 +403,7 @@ class Avatar:
             speed=1,
             energy_recharge_rate=20,
             sensors=[radar_sensor],
-            database_available=False
+            database_available=database_available
         )
 
     def get_name(self):
@@ -406,4 +422,24 @@ class Avatar:
         return self.max_slope
     def get_energy_recharge_rate(self):
         return self.energy_recharge_rate
+
+
+if __name__ == "__main__":
+    print("Debugging avatar.py...")
+
+    test_avatar = Avatar(
+        name="DebugBot",
+        weight=60,
+        material="Steel",
+        description="Avatar for debugging",
+        battery_capacity=150,
+        battery_consumption_rate=7,
+        driving_force=300,
+        speed=3,
+        energy_recharge_rate=15,
+        database_available=True
+    )
+
+    print("Avatar created! Check the DB.")
+
 
