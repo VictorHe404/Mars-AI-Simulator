@@ -34,6 +34,11 @@ class CommandController:
         sbrain_parser = subparsers.add_parser("sbrain", help="Set a brain for an avatar")
         sbrain_parser.add_argument("brain_name", help="Name of the brain to set")
 
+        # Sdb command (Set or unset the database)
+        sdb_parser = subparsers.add_parser("sdb", help="Enable or disable database usage")
+        sdb_parser.add_argument("state", choices=["true", "false"],
+                                help="Enable (true) or disable (false) database usage")
+
 
     def notify(self, event: Event) -> None:
         """

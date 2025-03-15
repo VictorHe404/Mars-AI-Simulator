@@ -43,6 +43,9 @@ class SimulatorManager:
                 self.set_task(command["target"][0], command["target"][1],
                               command["target"][2], command["target"][3])
                 self.run_simulator()
+            elif command["command"] == "sdb":
+                print("SimulatorManager received sdb command")
+                self.set_database(command["state"] == "true")
 
     def initialize(self, avatar_name: str | None) -> None:
         """
@@ -60,33 +63,33 @@ class SimulatorManager:
     def create_avatar(self, avatar_name: str) -> None:
         is_created = self.simulator.add_avatar(avatar_name)
         if not is_created:
-            error_message = "Avatar creation failed due to duplicated avatar name."
+            error_message = f"[cavatar] Avatar creation failed due to duplicated avatar name: {avatar_name}."
             self.event_manager.post_event(
                 ActionStatusEvent(is_created,error_message, "create_avatar"))
         else:
-            success_message = "Avatar created successfully."
+            success_message = f"[cavatar] Avatar '{avatar_name}' created successfully."
             self.event_manager.post_event(
                 ActionStatusEvent(is_created, success_message, "create_avatar"))
 
     def set_avatar(self, avatar_name: str) -> None:
         is_set = self.simulator.set_avatar(avatar_name)
         if not is_set:
-            error_message = "Avatar set failed due to avatar does not exist."
+            error_message = f"[savatar] Avatar '{avatar_name}' set failed because it does not exist."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_avatar"))
         else:
-            success_message = "Avatar set successfully."
+            success_message = f"[savatar] Avatar '{avatar_name}' set successfully."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_avatar"))
 
     def set_map(self, map_name: str) -> None:
         is_set = self.simulator.set_map(map_name)
         if not is_set:
-            error_message = "Map set failed due map not found."
+            error_message = f"[smap] Map '{map_name}' set failed because the map was not found."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_map"))
         else:
-            success_message = "Map set successfully."
+            success_message = f"[smap] Map '{map_name}' set successfully."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_map"))
 
@@ -94,32 +97,39 @@ class SimulatorManager:
         is_set = self.simulator.set_task(start_row, start_col,
                                          destination_row, destination_col)
         if not is_set:
-            error_message = "Task set failed due to invalid coordinates."
+            error_message = f"[move] Task set failed due to invalid coordinates: ({start_row}, {start_col}) → ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_task"))
         else:
-            success_message = "Task set successfully."
+            success_message = f"[move] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_task"))
 
     def set_brain(self, brain_name: str) -> None:
         is_set = self.simulator.set_brain(brain_name)
         if not is_set:
-            error_message = f"Brain set failed due to invalid brain name: {brain_name}."
+            error_message = f"[sbrain] Brain set failed due to invalid brain name: {brain_name}."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_brain"))
         else:
-            success_message = f"Brain set successfully to {brain_name}."
+            success_message = f"[sbrain] Brain set successfully to {brain_name}."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_brain"))
 
     def run_simulator(self) -> None:
         is_running = self.simulator.run()
         if not is_running:
-            error_message = "Simulator failed to start due to unset elements."
+            error_message = "[move] Simulator failed to start due to unset elements (missing map, avatar, or task)."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, error_message, "run_simulator"))
         else:
-            success_message = "Simulator finished successfully."
+            success_message = "[move] Simulator finished successfully."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, success_message, "run_simulator"))
+
+    def set_database(self, database_available: bool) -> None:
+        self.simulator.database_available = database_available
+        success_message = f"[sdb] Database connection set to {database_available}."
+        self.event_manager.post_event(
+            ActionStatusEvent(True, success_message, "set_database")
+        )

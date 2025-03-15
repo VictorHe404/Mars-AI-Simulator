@@ -4,7 +4,7 @@ import os
 
 # Construct the absolute path to the database
 #DB_NAME = os.path.join(ROOT_DIR, "avatar.db")
-DB_INITIALIZE_NAME = "C:/Users/Justi/OneDrive/文档/GitHub/COMP361/avatar.db"
+DB_INITIALIZE_NAME = "../../avatar.db"
 DB_NAME = "avatar.db"
 #DB_NAME = "avatar.db"
 

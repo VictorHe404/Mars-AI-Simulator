@@ -101,6 +101,8 @@ class Avatar:
                 print("22")
                 cursor = conn.cursor()
                 print("44")
+
+                # Cause error
                 cursor.execute(query, params)
                 print("55")
                 conn.commit()

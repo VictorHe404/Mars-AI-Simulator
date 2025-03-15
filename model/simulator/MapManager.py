@@ -12,10 +12,10 @@ class MapManager:
         Initialize the MapManager class. map data store in cloud
         Parameters:
         map_names(string[]): an attribute to store a string list, contain names of different maps
-        1 is default value, represent the 100x100Louth_Crater_ice_mound_subPart.tif
+        1 is default value, represent the Louth_Crater_Normal.tif
         map_path (str) : store the document's path , the document contains all the map files under this document
         """
-        self.map_names=["100x100Louth_Crater_ice_mound_subPart", "100x100Louth_Crater_ice_mound_subPart_sharp"]
+        self.map_names=["Louth_Crater_Normal", "Louth_Crater_Sharp"]
         base_dir = os.path.dirname(os.path.abspath(__file__))  # get abs path of `MapManager.py`
         project_repo_dir = os.path.abspath(os.path.join(base_dir, "../../"))  # move 2 level of directory to the repo directory
         self.map_path = os.path.join(project_repo_dir, "MapImage/")  # combie the above path with `MapImage/`

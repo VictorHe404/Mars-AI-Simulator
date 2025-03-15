@@ -34,7 +34,7 @@ if __name__ == "__main__":
     off_db_avatar.bind_sensor(radar_sensor) 
     simulator = Simulator()
     simulator.set_map("100x100Louth_Crater_ice_mound_subPart_sharp")
-    simulator.set_task(20,20,90,90)
+    simulator.set_task(20,20,20,20)
     simulator.set_avatar_no_db(off_db_avatar)
     simulator.set_brain("astar")
     simulator.run()
