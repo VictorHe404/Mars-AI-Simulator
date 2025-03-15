@@ -1,9 +1,0 @@
-.DS_Store
-.vscode
-.idea/*
-*/__pychache__/*
-*.pyc
-*.db
-.gitignore*
-.git*
-*/*.db
