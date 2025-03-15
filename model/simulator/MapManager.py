@@ -52,6 +52,10 @@ class MapManager:
         return (map_array,min_value,max_value)
 
 
+    def get_map_names(self):
+        return self.map_names
+
+
 
 
 

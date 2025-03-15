@@ -46,6 +46,16 @@ class SimulatorManager:
             elif command["command"] == "sdb":
                 print("SimulatorManager received sdb command")
                 self.set_database(command["state"] == "true")
+            elif command["command"] == "lavatar":
+                print("SimulatorManager received lavatar command")
+                self.list_avatars()
+            elif command["command"] == "lmap":
+                print("SimulatorManager received lmap command")
+                self.list_maps()
+            elif command["command"] == "lbrain":
+                print("SimulatorManager received lbrain command")
+                self.list_brains()
+
 
     def initialize(self, avatar_name: str | None) -> None:
         """
@@ -133,3 +143,46 @@ class SimulatorManager:
         self.event_manager.post_event(
             ActionStatusEvent(True, success_message, "set_database")
         )
+
+    def list_avatars(self) -> None:
+        avatar_names = self.simulator.get_avatar_names()
+
+        if not avatar_names:
+            message = "[lavatar] No avatars found."
+        else:
+            message = "[lavatar] List of existing avatars:\n"
+            message += "\n".join([f"  - {name}" for name in avatar_names])
+
+        self.event_manager.post_event(
+            ActionStatusEvent(True, message, "list_avatars")
+        )
+
+    def list_brains(self) -> None:
+        brain_names = self.simulator.get_brain_names()
+
+        if not brain_names:
+            message = "[lbrain] No brains found."
+        else:
+            message = "[lbrain] List of available brains:\n"
+            message += "\n".join([f"  - {name}" for name in brain_names])
+
+        self.event_manager.post_event(
+            ActionStatusEvent(True, message, "list_brains")
+        )
+
+    def list_maps(self) -> None:
+        map_names = self.simulator.get_map_names()
+
+        if not map_names:
+            message = "[lmap] No maps found."
+        else:
+            message = "[lmap] List of available maps:\n"
+            message += "\n".join([f"  - {name}" for name in map_names])
+
+        self.event_manager.post_event(
+            ActionStatusEvent(True, message, "list_maps")
+        )
+
+
+
+

@@ -39,6 +39,10 @@ class CommandController:
         sdb_parser.add_argument("state", choices=["true", "false"],
                                 help="Enable (true) or disable (false) database usage")
 
+        lavatar_parser = subparsers.add_parser("lavatar", help="List existing avatars")
+        lmap_parser = subparsers.add_parser("lmap", help="List existing maps")
+        lbrain_parser = subparsers.add_parser("lbrain", help="List existing brains")
+
 
     def notify(self, event: Event) -> None:
         """

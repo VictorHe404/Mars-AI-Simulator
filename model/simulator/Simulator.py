@@ -213,6 +213,9 @@ class Simulator:
                 self.target_brain.set_map(self.target_map)
             return True
 
+    def get_map_names(self):
+        return self.map_manager.get_map_names()
+
     def set_task(self,s_row,s_col,d_row, d_col) :
         """
         set the target_task's related 4 fields
