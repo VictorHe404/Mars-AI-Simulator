@@ -52,6 +52,12 @@ class ActionStatusEvent(Event):
         self.msg = msg
         self.action_name = action_name
 
+class VisualizerEvent(Event):
+    """
+    Visualizer Event
+    """
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
 
 
 class EventManager:

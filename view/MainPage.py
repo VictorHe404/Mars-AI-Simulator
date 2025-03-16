@@ -60,6 +60,14 @@ class MainPage(QMainWindow):
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
+        # Timer to update image every 100ms (10 FPS)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_image)
+        self.timer.start(100)  # 100ms = 10 images per second
+        self.pic_counter = 0
+        self.update_image()  # Display first image
+
+
     def process_command(self, command):
         """Emit the command to Visualizer."""
         self.command_signal.emit(command)
@@ -67,6 +75,17 @@ class MainPage(QMainWindow):
     def display_output(self, message):
         """Display output in the command prompt's activity log."""
         self.command_prompt.display_output(message)
+
+    def update_image(self):
+        """Update the map image."""
+        cache_path = os.path.join(os.getcwd(), 'cache_directory')
+        pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
+        if os.path.exists(os.path.join(cache_path, f'elevation_map_{self.pic_counter + 1}.png')):
+            self.mini_map.update_minimap(pic_path)
+            self.main_map.update_mainmap(pic_path)
+            self.pic_counter += 1
+        else:
+            self.pic_counter = float('inf')
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

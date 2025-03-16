@@ -28,7 +28,7 @@ class MiniMapView(QGraphicsView):
         self.setStyleSheet("border: 2px solid black;")
 
         # Load initial mini map background
-        self.init_minimap("viewImage/miniMapDemo.png")
+        self.init_minimap("viewImage/initialize.png")
 
     def init_minimap(self, relative_path):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -86,7 +86,7 @@ class MainMapView(QGraphicsView):
         self.setStyleSheet("border: 2px solid black;")
 
         # Load the initial main map background
-        self.init_mainmap("viewImage/mainMapDemo.png")
+        self.init_mainmap("viewImage/initialize.png")
 
     def init_mainmap(self, relative_path):
         """

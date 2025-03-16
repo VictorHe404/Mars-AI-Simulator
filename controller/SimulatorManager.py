@@ -2,6 +2,7 @@ from xmlrpc.client import boolean
 
 from model.simulator import *
 from .EventManager import *
+import threading
 
 class SimulatorManager:
 
@@ -106,12 +107,13 @@ class SimulatorManager:
     def set_task(self, start_row, start_col, destination_row, destination_col) -> None:
         is_set = self.simulator.set_task(start_row, start_col,
                                          destination_row, destination_col)
+        self.event_manager.post_event(ActionStatusEvent(True, "[move] Task set successfully.", "set_task"))
         if not is_set:
             error_message = f"[move] Task set failed due to invalid coordinates: ({start_row}, {start_col}) → ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_task"))
         else:
-            success_message = f"[move] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col})."
+            success_message = f"[move] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col}). \n start calculating the path."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_task"))
 
@@ -133,9 +135,11 @@ class SimulatorManager:
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, error_message, "run_simulator"))
         else:
-            success_message = "[move] Simulator finished successfully."
+            success_message = "[move] Simulator finished successfully, start to animate the process."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, success_message, "run_simulator"))
+            self.event_manager.post_event(VisualizerEvent("start animation"))
+
 
     def set_database(self, database_available: bool) -> None:
         self.simulator.database_available = database_available
