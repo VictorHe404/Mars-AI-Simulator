@@ -56,8 +56,9 @@ class VisualizerEvent(Event):
     """
     Visualizer Event
     """
-    def __init__(self, msg: str) -> None:
+    def __init__(self, msg: str, map_path: str) -> None:
         self.msg = msg
+        self.map_path = map_path
 
 
 class EventManager:

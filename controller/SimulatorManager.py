@@ -101,6 +101,7 @@ class SimulatorManager:
                 ActionStatusEvent(is_set, error_message, "set_map"))
         else:
             success_message = f"[smap] Map '{map_name}' set successfully."
+            self.event_manager.post_event(VisualizerEvent("minimap", map_name))
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_map"))
 
@@ -129,16 +130,18 @@ class SimulatorManager:
                 ActionStatusEvent(is_set, success_message, "set_brain"))
 
     def run_simulator(self) -> None:
-        is_running = self.simulator.run()
+        is_running, running_result = self.simulator.run()
         if not is_running:
             error_message = "[move] Simulator failed to start due to unset elements (missing map, avatar, or task)."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, error_message, "run_simulator"))
         else:
-            success_message = "[move] Simulator finished successfully, start to animate the process."
+            success_message = "[move] Simulator finished successfully, start to animate the process.\n"
+            result_message = f"[move] Task completed." if running_result else "[move] Task failed."
+            message = success_message + result_message
             self.event_manager.post_event(
-                ActionStatusEvent(is_running, success_message, "run_simulator"))
-            self.event_manager.post_event(VisualizerEvent("start animation"))
+                ActionStatusEvent(is_running, message, "run_simulator"))
+            self.event_manager.post_event(VisualizerEvent("animation", self.simulator.target_map))
 
 
     def set_database(self, database_available: bool) -> None:

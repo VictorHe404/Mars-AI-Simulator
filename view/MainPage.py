@@ -27,7 +27,7 @@ class MainPage(QMainWindow):
         # Dynamically set width and height based on screen size (90% of screen size)
         self.main_page_width = int(rect.width()*0.5)
         self.main_page_height = int(rect.height()*0.5)
-
+        self.showFullScreen()
         # Set the geometry of the window
         self.setGeometry(50, 50, self.main_page_width, self.main_page_height)
         # Model and Controller
@@ -80,12 +80,17 @@ class MainPage(QMainWindow):
         """Update the map image."""
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
-        if os.path.exists(os.path.join(cache_path, f'elevation_map_{self.pic_counter + 1}.png')):
-            self.mini_map.update_minimap(pic_path)
+        if os.path.exists(os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')):
+            # self.mini_map.update_minimap(pic_path)
             self.main_map.update_mainmap(pic_path)
             self.pic_counter += 1
         else:
             self.pic_counter = float('inf')
+
+    def update_minimap(self, mini_map_image_path):
+        pic_path = os.path.join("viewImage", mini_map_image_path)
+        print(pic_path)
+        self.mini_map.update_minimap(pic_path)
 
     def start_visualizer(self):
         self.pic_counter = 0

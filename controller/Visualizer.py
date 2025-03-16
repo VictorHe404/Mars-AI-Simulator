@@ -68,7 +68,10 @@ class Visualizer(QObject):
             print("status message",event.msg)
             self.main_page.display_output(event.msg)
         elif isinstance(event, VisualizerEvent):
-            self.main_page.start_visualizer()
+            if event.msg == "animation":
+                self.main_page.start_visualizer()
+            elif event.msg == "minimap":
+                self.main_page.update_minimap("Louth_Crater_minimap.png")
 
     def __str__(self):
         return "Visualizer"

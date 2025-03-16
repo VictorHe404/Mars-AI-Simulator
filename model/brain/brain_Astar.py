@@ -10,7 +10,7 @@ import heapq  # priority queue
 class BrainAStar(Brain):
     def run(self):
         if not self.current_task:
-            return []
+            return [], False
 
         start = (self.current_task.start_row, self.current_task.start_col)
         end = (self.current_task.des_row, self.current_task.des_col)
@@ -57,7 +57,7 @@ class BrainAStar(Brain):
             #break condition
             if not chosen_node:
                 print("The destination is unreachable (no valid adjacent nodes), task failed")
-                return self.task_trail
+                return self.task_trail, False
 
             #apply chosen node
             f_score, g_score, x, y, path = chosen_node
@@ -68,7 +68,7 @@ class BrainAStar(Brain):
                 log_entry = Log(index_x=x, index_y=y, detect_map=[row[:] for row in self.detect_map],
                                 time=self.time, energy=energy)
                 self.task_trail.append(log_entry)
-                return self.task_trail
+                return self.task_trail, True
 
             if (x, y) in visited:
                 #filter for duplicate
@@ -170,13 +170,15 @@ class BrainAStar(Brain):
 
         #if cant find the end
         print("The destination is unreachable, task failed")
-        return self.task_trail
+        return self.task_trail, False
 
+    '''
     def reset(self):
         self.task_trail.clear()
         self.time = 0
-        self.detect_map = [[0 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
+        self.detect_map = [[114514 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
         return True
+    '''
 
     def movable(self, avatar_x, avatar_y, target_x, target_y):
         threshold = self.current_avatar.get_max_slope()

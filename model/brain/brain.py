@@ -42,6 +42,7 @@ class Brain(ABC):
     def run(self):
         pass
 
-    @abstractmethod
     def reset(self):
-        pass
+        self.task_trail.clear()
+        self.time = 0
+        self.detect_map = [[0 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]

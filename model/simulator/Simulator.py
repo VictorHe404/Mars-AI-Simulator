@@ -58,6 +58,7 @@ class Simulator:
         self.result_trail=None
         self.map_minValue=0.0
         self.map_maxValue=99999.0
+        self.path_finding_result = False
 
         self.path_finding_counter = 0
 
@@ -210,7 +211,7 @@ class Simulator:
         else:
             (self.target_map, self.map_minValue, self.map_maxValue) = (t_map, t_min, t_max)
             if self.target_brain is not None:
-                self.target_brain.set_map(self.target_map)
+                self.target_brain.set_original_map(self.target_map)
             return True
 
     def get_map_names(self):
@@ -277,16 +278,18 @@ class Simulator:
     # Run the simulation and generate the results
     def run(self):
         if self.target_brain.is_ready_to_run():
+            self.path_finding_result = False
             self.clear_directory()
+            self.target_brain.reset()
             self.path_finding_counter = 0
-            self.result_trail=self.target_brain.run()
+            self.result_trail, self.path_finding_result=self.target_brain.run()
             self.plot_results()
             self.plot_full_map()
             self.save_log_to_file()
-            return True
+            return True, self.path_finding_result
         else:
             print("The target brain is not ready yet")
-            return False
+            return False, False
 
 
     # The overall function to plot the result

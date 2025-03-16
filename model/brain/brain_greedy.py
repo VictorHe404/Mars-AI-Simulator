@@ -16,7 +16,7 @@ class BrainGreedy(Brain):
         # The visit set to track whether a position has been visited
         visited = set()
         if not self.current_task:
-            return []
+            return [], False
 
 
         # Initialization
@@ -88,8 +88,9 @@ class BrainGreedy(Brain):
             print("The destination is reachable, task succeeded")
             log_entry = Log(index_x=x, index_y=y, detect_map=[row[:] for row in self.detect_map], time=self.time, energy=energy)
             self.task_trail.append(log_entry)
+            return self.task_trail, True
 
-        return self.task_trail
+        return self.task_trail, False
 
     def reset(self):
         self.task_trail.clear()
