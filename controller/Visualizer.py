@@ -68,7 +68,7 @@ class Visualizer(QObject):
             print("status message",event.msg)
             self.main_page.display_output(event.msg)
         elif isinstance(event, VisualizerEvent):
-            self.main_page.pic_counter = 0
+            self.main_page.start_visualizer()
 
     def __str__(self):
         return "Visualizer"

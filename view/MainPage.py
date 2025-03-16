@@ -64,7 +64,7 @@ class MainPage(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_image)
         self.timer.start(100)  # 100ms = 10 images per second
-        self.pic_counter = 0
+        self.pic_counter = float('inf')
         self.update_image()  # Display first image
 
 
@@ -86,6 +86,9 @@ class MainPage(QMainWindow):
             self.pic_counter += 1
         else:
             self.pic_counter = float('inf')
+
+    def start_visualizer(self):
+        self.pic_counter = 0
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
