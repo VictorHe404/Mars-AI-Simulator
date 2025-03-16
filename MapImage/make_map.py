@@ -52,4 +52,4 @@ if __name__ == "__main__":
     max_slope, min_slope = analyze_slopes(cropped_map_2)
     print(f"Biggest slope: {max_slope}")
     print(f"Smallest slope: {min_slope}")
-    tifreader.save_array_to_tif(cropped_map_2, "Louth_Crater_Sharp.tif")
+    tifreader.save_array_to_tif(cropped_map_2, "100x100Louth_Crater_ice_mound_subPart_sharp.tif")

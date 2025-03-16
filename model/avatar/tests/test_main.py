@@ -36,6 +36,7 @@ class TestAvatarSystem(unittest.TestCase):
         conn.commit()
         conn.close()
 
+    # 📌 **测试数据库连接**
     def test_database_connection(self):
         """Test if database connection is working and tables are correctly initialized"""
         conn = sqlite3.connect(DB_NAME)
@@ -48,6 +49,7 @@ class TestAvatarSystem(unittest.TestCase):
         self.assertIn("Sensor", tables)
         self.assertIn("AvatarSensor", tables)
 
+    # 📌 **测试 Avatar 创建**
     def test_avatar_creation(self):
         """Test creation of an Avatar with unique name and ID"""
         avatar = Avatar(name="TestAvatar", weight=50, material="Metal",
@@ -58,6 +60,7 @@ class TestAvatarSystem(unittest.TestCase):
         self.assertIsNotNone(avatar.id)
         self.assertEqual(avatar.name, "TestAvatar")
 
+    # 📌 **测试 Avatar 名称唯一性**
     def test_duplicate_avatar_name(self):
         """Test creating two Avatars with the same name should raise IntegrityError"""
         Avatar(name="DuplicateAvatar", weight=50, material="Metal",
@@ -71,6 +74,7 @@ class TestAvatarSystem(unittest.TestCase):
                    battery_consumption_rate=12, driving_force=110, speed=12,
                    energy_recharge_rate=6)
 
+    # 📌 **测试 Avatar 删除**
     def test_avatar_deletion(self):
         """Test deleting an Avatar from the database"""
         avatar = Avatar(name="DeleteAvatar", weight=50, material="Metal",
@@ -81,6 +85,7 @@ class TestAvatarSystem(unittest.TestCase):
         deleted = Avatar.delete_avatar("DeleteAvatar")
         self.assertTrue(deleted, "Avatar should be deleted successfully")
 
+    # 📌 **测试 Sensor 创建**
     def test_sensor_creation(self):
         """Test creation of a Sensor with unique name and ID"""
         sensor = Sensor(name="TestSensor", range_=10, fov=90, battery_consumption=5,
@@ -89,6 +94,7 @@ class TestAvatarSystem(unittest.TestCase):
         self.assertIsNotNone(sensor.id)
         self.assertEqual(sensor.name, "TestSensor")
 
+    # 📌 **测试 Sensor 名称唯一性**
     def test_duplicate_sensor_name(self):
         """Test creating two Sensors with the same name should raise IntegrityError"""
         Sensor(name="DuplicateSensor", range_=15, fov=120, battery_consumption=8,
@@ -98,6 +104,7 @@ class TestAvatarSystem(unittest.TestCase):
             Sensor(name="DuplicateSensor", range_=20, fov=180, battery_consumption=10,
                    description="Second Sensor", direction=180)
 
+    # 📌 **测试 Avatar 绑定和解绑 Sensor**
     def test_bind_and_unbind_sensor(self):
         """Test binding and unbinding of Sensors to Avatar"""
         avatar = Avatar(name="BindTestAvatar", weight=70, material="Metal",
@@ -116,6 +123,7 @@ class TestAvatarSystem(unittest.TestCase):
         sensors_after_unbind = avatar.get_sensors()
         self.assertNotIn(sensor.id, [s.id for s in sensors_after_unbind])
 
+    # 📌 **测试 DetectionMask 生成**
     def test_detection_mask_generation(self):
         """Test DetectionMask generation and accuracy"""
         avatar = Avatar(name="DetectionBot", weight=60, material="Plastic",
@@ -130,6 +138,7 @@ class TestAvatarSystem(unittest.TestCase):
         detection_mask = avatar.get_detection_mask()
         self.assertGreater(len(detection_mask.detectable_positions), 0)
 
+    # 📌 **测试 DetectionMask 自动刷新**
     def test_detection_mask_refresh(self):
         """Test auto-refresh of DetectionMask when binding new sensors"""
         avatar = Avatar(name="RefreshBot", weight=65, material="Carbon",
