@@ -26,7 +26,7 @@ import model.brain as Brain
 
 class Simulator:
 
-    def __init__(self):
+    def __init__(self, database_available = True):
         """
         Initialize the Simulator class.
 
@@ -61,8 +61,10 @@ class Simulator:
 
         self.path_finding_counter = 0
 
-        self.result_directory_path = "../cache_directory"
+        self.result_directory_path = "cache_directory"
         self.log_counter = 1
+        self.database_available = database_available
+        self.avatars = []
 
     def set_avatar(self, name):
         """
@@ -70,25 +72,37 @@ class Simulator:
         Parameters:
         name (string): The Avatar object's name.
         """
-        avatar = Avatar.get_avatar_by_name(name)  # Retrieve Avatar from database
-        if avatar:
-            self.target_avatar = avatar
-            print(f"Avatar '{name}' has been set as the target avatar.")
 
-            if self.target_environment:
-                self.target_avatar.calculate_max_slope_difference(
-                    self.target_environment.get_friction(),
-                    self.target_environment.get_gravity(),
-                    10
-                )
+        if self.database_available:
+            avatar = Avatar.get_avatar_by_name(name)  # Retrieve Avatar from database
+            if avatar:
+                self.target_avatar = avatar
+                print(f"Avatar '{name}' has been set as the target avatar.")
 
-            if self.target_brain:
-                self.target_brain.set_avatar(self.target_avatar)
+                if self.target_environment:
+                    self.target_avatar.calculate_max_slope_difference(
+                        self.target_environment.get_friction(),
+                        self.target_environment.get_gravity(),
+                        10
+                    )
 
-            return True
+                if self.target_brain:
+                    self.target_brain.set_avatar(self.target_avatar)
+
+                return True
+            else:
+                print(f"Avatar '{name}' not found in database.")
+                return False
         else:
-            print(f"Avatar '{name}' not found in database.")
+            for avatar in self.avatars:
+                if avatar.name == name:
+                    print(f"Avatar '{name}' found in local list. Setting without database.")
+                    self.set_avatar_no_db(avatar)
+                    return True
+
+            print(f"Avatar '{name}' not found in local list.")
             return False
+
 
     def set_avatar_no_db(self, avatar_no_db:Avatar):
         self.target_avatar = avatar_no_db
@@ -97,45 +111,88 @@ class Simulator:
         if self.target_brain is not None:
             self.target_brain.set_avatar(self.target_avatar)
 
-    @staticmethod
-    def get_avatar_names():
+    def get_avatar_names(self):
         """
         Retrieve all Avatar names stored in the database.
         :return: List of Avatar names.
         """
-        return Avatar.get_all_avatar_names()
+        if self.database_available:
+            return Avatar.get_all_avatar_names()
+        else:
+            return [avatar.name for avatar in self.avatars]
 
-    @staticmethod
-    def add_avatar(name=None):
+
+    def add_avatar(self,name):
         """
-        Add a new Avatar to the database if it does not already exist.
+        Add a new Avatar to the database using the default Avatar parameters but with a specified name.
+
         :param name: The unique name of the new Avatar.
         :return: Boolean indicating success or failure.
         """
-        if name is None:
-            from model.test.integrated_test import off_db_avatar
-            name = off_db_avatar.name
-        existing_avatar = Avatar.get_avatar_by_name(name)
-        if existing_avatar:
-            print(f"Avatar '{name}' already exists in the database.")
-            return False
+        if self.database_available:
 
-        # Create a new Avatar instance and save it to the database
-        new_avatar = Avatar(
-            name=name,
-            weight=75.0,  # Default values (can be modified later)
-            material="Unknown",
-            description="New Avatar",
-            battery_capacity=1000.0,
-            battery_consumption_rate=10.0,
-            driving_force=50.0,
-            speed=2.0,
-            energy_recharge_rate=5.0,
-            sensors=[]
-        )
-        new_avatar.save_to_db()
-        print(f"New Avatar '{name}' added successfully.")
-        return True
+            if not name:
+                print("Error: Avatar name cannot be empty.")
+                return False
+
+            print("The name check is passed")
+            existing_avatar = Avatar.get_avatar_by_name(name)
+            print("The avatar.get is passed")
+            if existing_avatar:
+                print(f"Avatar '{name}' already exists in the database.")
+                return False
+
+            print("Avatar check is passed")
+            default_avatar = Avatar.get_default_avatar(name)
+            print("The default avatar.get is passed")
+            new_avatar = Avatar(
+                name=name,
+                weight=default_avatar.weight,
+                material=default_avatar.material,
+                description=default_avatar.description,
+                battery_capacity=default_avatar.battery_capacity,
+                battery_consumption_rate=default_avatar.battery_consumption_rate,
+                driving_force=default_avatar.driving_force,
+                speed=default_avatar.speed,
+                energy_recharge_rate=default_avatar.energy_recharge_rate,
+                sensors=[],
+                database_available=True
+            )
+
+            new_avatar.save_to_db()
+
+            print("The new avatar.save to db is passed")
+
+            for sensor in default_avatar.sensors:
+                new_avatar.bind_sensor(sensor)
+
+            print(f"New Avatar '{name}' added successfully with a unique sensor '{default_avatar.sensors[0].name}'.")
+            return True
+
+        else:
+            for avatar in self.avatars:
+                if avatar.name == name:
+                    print(f"Avatar '{name}' already exists in the database.")
+                    return False
+
+            default_avatar = Avatar.get_default_avatar(name)
+            new_avatar = Avatar(
+                name=name,
+                weight=default_avatar.weight,
+                material=default_avatar.material,
+                description=default_avatar.description,
+                battery_capacity=default_avatar.battery_capacity,
+                battery_consumption_rate=default_avatar.battery_consumption_rate,
+                driving_force=default_avatar.driving_force,
+                speed=default_avatar.speed,
+                energy_recharge_rate=default_avatar.energy_recharge_rate,
+                sensors=[],
+                database_available=False
+            )
+            for sensor in default_avatar.sensors:
+                new_avatar.bind_sensor(sensor)
+            self.avatars.append(new_avatar)
+            return True
 
 
     def set_map(self, name:str):
@@ -155,6 +212,9 @@ class Simulator:
             if self.target_brain is not None:
                 self.target_brain.set_map(self.target_map)
             return True
+
+    def get_map_names(self):
+        return self.map_manager.get_map_names()
 
     def set_task(self,s_row,s_col,d_row, d_col) :
         """
