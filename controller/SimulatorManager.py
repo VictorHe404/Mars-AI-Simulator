@@ -138,7 +138,7 @@ class SimulatorManager:
         else:
             success_message = "[move] Simulator finished successfully, start to animate the process.\n"
             result_message = f"[move] Task completed." if running_result else "[move] Task failed."
-            message = success_message + result_message
+            message =  result_message + success_message
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, message, "run_simulator"))
             self.event_manager.post_event(VisualizerEvent("animation", self.simulator.target_map))
