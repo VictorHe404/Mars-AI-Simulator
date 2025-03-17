@@ -1,0 +1,20 @@
+the subpart is extracted from LouthCraterRealimage.jpg and DTEPC_053825_2505_053812_2505_A01.tif
+2 points a and b form the diagonal of the square , in this graph below
+
+a--------o       - x direction
+|        | 
+|        |
+|        |
+o--------b
+
+|
+y direction 
+
+coordinates value are below : 
+in tif coordinate system located in DTEPC_053825_2505_053812_2505_A01.tif
+point a : (x,y) = 3737,3540
+point b : (x,y) = 4737,4540
+
+in jpg coordinate system located in LouthCraterRealimage.jpg
+point a : (x,y) = 373.7,354.0
+point b : (x,y) = 473.7,454.0
