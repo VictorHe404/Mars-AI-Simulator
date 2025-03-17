@@ -27,7 +27,7 @@ class MainPage(QMainWindow):
         # Dynamically set width and height based on screen size (90% of screen size)
         self.main_page_width = int(rect.width()*0.5)
         self.main_page_height = int(rect.height()*0.5)
-        self.showFullScreen()
+        # self.showFullScreen()
         # Set the geometry of the window
         self.setGeometry(50, 50, self.main_page_width, self.main_page_height)
         # Model and Controller

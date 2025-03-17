@@ -1,3 +1,4 @@
+from PyQt6.QtGui import QTextCursor
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLineEdit, QHBoxLayout
 from PyQt6.QtCore import pyqtSignal
 
@@ -47,3 +48,4 @@ class CommandPromptWidget(QWidget):
     def display_output(self, message):
         """Display the output message in the activity log."""
         self.activity_log.append(message)
+        self.activity_log.moveCursor(QTextCursor.MoveOperation.End)

@@ -23,7 +23,7 @@ class TaskbarWidget(QWidget):
             button.setFlat(True)
             button.setFixedHeight(40)
             button.setStyleSheet("""
-                QPushButton { padding: 10px; border: none; }
+                QPushButton { padding: 10px; border: 2px solid #555; border-radius: 5px;}
                 QPushButton:hover { background-color: #ddd; }
             """)
             taskbar_layout.addWidget(button)
