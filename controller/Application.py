@@ -1,5 +1,5 @@
 from .EventManager import *
-from .CommandController import CommandController
+from .CommandManager import CommandController
 from .Visualizer import Visualizer
 from .SimulatorManager import *
 
