@@ -34,6 +34,14 @@ class CommandController:
         sbrain_parser = subparsers.add_parser("sbrain", help="Set a brain for an avatar")
         sbrain_parser.add_argument("brain_name", help="Name of the brain to set")
 
+        stask_parser = subparsers.add_parser("stask", help="Set a task for an avatar")
+        stask_parser.add_argument("x1", type=int, help="Start position X")
+        stask_parser.add_argument("y1", type=int, help="Start position Y")
+        stask_parser.add_argument("x2", type=int, help="End position X")
+        stask_parser.add_argument("y2", type=int, help="End position Y")
+
+        run_parser = subparsers.add_parser("run", help="Run the simulation")
+
         # Sdb command (Set or unset the database)
         sdb_parser = subparsers.add_parser("sdb", help="Enable or disable database usage")
         sdb_parser.add_argument("state", choices=["true", "false"],
@@ -42,6 +50,14 @@ class CommandController:
         lavatar_parser = subparsers.add_parser("lavatar", help="List existing avatars")
         lmap_parser = subparsers.add_parser("lmap", help="List existing maps")
         lbrain_parser = subparsers.add_parser("lbrain", help="List existing brains")
+
+        fast_task_parser = subparsers.add_parser("fast_task", help="Quickly set avatar, map, brain, and move")
+        fast_task_parser.add_argument("avatar_name", help="Name of the avatar to set")
+        fast_task_parser.add_argument("map_name", help="Name of the map to set")
+        fast_task_parser.add_argument("brain_name", help="Name of the brain to set")
+        fast_task_parser.add_argument("-t", "--target", type=int, nargs=4, required=True,
+                                      help="Target position as four integers (x1, y1, x2, y2)")
+
 
 
     def notify(self, event: Event) -> None:

@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sympy import false
+from matplotlib.colors import LightSource
 
 from model.simulator.MapManager import MapManager
 from model.simulator.Log import Log
@@ -16,6 +17,7 @@ from model.simulator.environment import Environment
 from model.simulator.task import Task
 from model.avatar import Avatar, DetectionMask,  Sensor
 import model.brain as Brain
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
 
@@ -63,6 +65,7 @@ class Simulator:
         self.path_finding_counter = 0
 
         self.result_directory_path = "cache_directory"
+        self.result_directory_path_2 = "cache_directory_2"
         self.log_counter = 1
         self.database_available = database_available
         self.avatars = []
@@ -212,6 +215,16 @@ class Simulator:
             (self.target_map, self.map_minValue, self.map_maxValue) = (t_map, t_min, t_max)
             if self.target_brain is not None:
                 self.target_brain.set_original_map(self.target_map)
+            #self.current_map = t_map
+            save_path = os.path.join(self.result_directory_path_2, f'set_map.png')
+            if os.path.exists(save_path):
+                try:
+                    os.remove(save_path)
+                    print(f"Deleted existing map file: {save_path}")
+                except Exception as e:
+                    print(f"Error deleting file {save_path}: {e}")
+            self.plot_full_map_set_map(save_path, self.target_task)
+
             return True
 
     def get_map_names(self):
@@ -232,6 +245,16 @@ class Simulator:
         self.target_task=Task(s_row,s_col,d_row,d_col)
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
+        print("Debug Print")
+        if len(self.target_map) != 0:
+            save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
+            if os.path.exists(save_path):
+                try:
+                    os.remove(save_path)
+                    print(f"Deleted existing map file: {save_path}")
+                except Exception as e:
+                    print(f"Error deleting file {save_path}: {e}")
+            self.plot_full_map_set_map(save_path, self.target_task)
         return True
 
     def get_brain_names(self):
@@ -302,29 +325,45 @@ class Simulator:
             save_path = os.path.join(self.result_directory_path, f'elevation_map_{i}.png')
             print(f"Saving elevation map to {save_path}")
 
-            Simulator.plot_elevation_map(
+            self.plot_elevation_map(
                 elevation_data=log.get_detect_map(),
-                min_val=self.map_minValue,
-                max_val=self.map_maxValue,
+                #min_val=self.map_minValue,
+                #max_val=self.map_maxValue,
                 undetected_val=114514,
                 avatar_positions=recent_positions,
                 save_path=save_path
             )
             self.path_finding_counter += 1
 
+    def plot_elevation_map(self, elevation_data, undetected_val, avatar_positions=None,
+                           save_path=None, show_colorbar=False, show_label=False):
+        fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
 
-    # Plot the result log in the format of elevation map
-    @staticmethod
-    def plot_elevation_map(elevation_data, min_val, max_val, undetected_val, avatar_positions=None,
-                           save_path='../cache_directory/elevation_map.png'):
+        elevation_data = np.array(elevation_data, dtype=np.float32)
+
+        if self.target_map is not None:
+            current_map = np.array(self.target_map, dtype=np.float32)
+            cmap_bg = plt.get_cmap('terrain')
+            norm_bg = mcolors.Normalize(vmin=self.map_minValue, vmax=self.map_maxValue)
+            ax.imshow(current_map, cmap=cmap_bg, norm=norm_bg, alpha=0.6)
 
         masked_data = np.ma.masked_where(elevation_data == undetected_val, elevation_data)
-        cmap = plt.get_cmap('terrain')
-        cmap.set_bad(color='gray')
-        norm = mcolors.Normalize(vmin=min_val, vmax=max_val)
-        fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
-        ax.imshow(masked_data, cmap=cmap, norm=norm, origin='upper')
 
+        if masked_data.mask.all():
+            print("Warning: All elevation data is masked. No detected terrain to plot.")
+
+        cmap = plt.get_cmap('terrain')
+        cmap.set_bad(alpha=0)
+        norm = mcolors.Normalize(vmin=self.map_minValue, vmax=self.map_maxValue)
+
+        ls = LightSource(azdeg=315, altdeg=45)
+        hillshade = ls.hillshade(masked_data.filled(np.mean(elevation_data)), vert_exag=1, dx=1, dy=1)
+
+        ax.imshow(hillshade, cmap='gray', alpha=0.5)
+        img = ax.imshow(masked_data, cmap=cmap, norm=norm, alpha=0.7)
+        ax.contour(masked_data, levels=15, colors='black', linewidths=0.5, alpha=0.5)
+
+        # **Draw avatar trail if available**
         if avatar_positions:
             num_positions = len(avatar_positions)
             trail_colors = ['yellow', 'orange', 'orangered', 'red']
@@ -334,30 +373,60 @@ class Simulator:
                 start_pos = avatar_positions[i - 1]
                 end_pos = avatar_positions[i]
                 color = next(color_cycle)
+                ax.plot([start_pos[1], end_pos[1]], [start_pos[0], end_pos[0]], color=color, linewidth=2)
 
-                ax.plot(
-                    [start_pos[1], end_pos[1]],
-                    [start_pos[0], end_pos[0]],
-                    color=color,
-                    linewidth=2
-                )
+            # Draw avatar's current position with direction
+            curr_pos = avatar_positions[-1]
+            if len(avatar_positions) > 1:
+                prev_pos = avatar_positions[-2]
+                dx = curr_pos[1] - prev_pos[1]
+                dy = curr_pos[0] - prev_pos[0]
 
-            latest_pos = avatar_positions[-1]
-            ax.plot(latest_pos[1], latest_pos[0], marker='D', color='red', markersize=5)
-            #ax.legend()
+                if abs(dx) > abs(dy):
+                    marker = '>' if dx > 0 else '<'
+                else:
+                    marker = '^' if dy < 0 else 'v'
+            else:
+                marker = '>'  # Default to right
+
+            ax.plot(curr_pos[1], curr_pos[0], marker=marker, color='red', markersize=8)
+
+        # **Plot start and end locations based on `self.target_task`**
+        if self.target_task:
+            start_x, start_y = self.target_task.start_row, self.target_task.start_col
+            end_x, end_y = self.target_task.des_row, self.target_task.des_col
+
+            # Plot start location (green circle)
+            ax.plot(start_y, start_x, marker='o', color='green', markersize=10, label="Start")
+
+            # Plot end location (blue square)
+            ax.plot(end_y, end_x, marker='s', color='blue', markersize=10, label="End")
 
         ax.set_axis_off()
-
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+        # **Show colorbar and labels only in the final frame**
+        if show_colorbar:
+            axins = inset_axes(ax, width="3%", height="30%", loc='upper right', borderpad=2)
+            cbar = plt.colorbar(img, cax=axins)
+            cbar.ax.yaxis.set_label_position('left')
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.set_label("")
+
+            if show_label:
+                # **Create start and end labels next to the color bar**
+                axins.text(-1.5, 1.05, "Start", color='green', fontsize=10, ha='right', va='center',
+                           transform=axins.transAxes)
+                axins.text(-1.5, -0.05, "End", color='blue', fontsize=10, ha='right', va='center',
+                           transform=axins.transAxes)
 
         if save_path:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
             plt.close(fig)
+            print(f"Saved map to {save_path}")
         else:
-
             plt.show()
-
 
     # Save the result to a log file
     def save_log_to_file(self):
@@ -403,23 +472,97 @@ class Simulator:
             except Exception as e:
                 print(f"Cannot Delete file: {f}. error: {e}")
 
+    def plot_full_map(self, expansion_steps=10):
+        if not self.result_trail:
+            print("No result trail found.")
+            return
 
-    # Plot the full path after the simulation
-    def plot_full_map(self):
-        all_positions = deque(maxlen=len(self.result_trail))
-        for log in self.result_trail:
-            all_positions.append((log.get_index_x(), log.get_index_y()))
-        save_path = os.path.join(self.result_directory_path, f'elevation_map_{self.path_finding_counter}.png')
-        print(f"Saving full elevation map to {save_path}")
+        final_pos = self.result_trail[-1].get_index_x(), self.result_trail[-1].get_index_y()
+        print(f"Starting progressive reveal from final position: {final_pos}")
 
-        Simulator.plot_elevation_map(
-            elevation_data=self.target_map,
-            min_val=self.map_minValue,
-            max_val=self.map_maxValue,
-            undetected_val=114514,
-            avatar_positions=all_positions,
-            save_path=save_path
-        )
+        last_detected_map = np.array(self.result_trail[-1].get_detect_map(), dtype=np.float32)
+        detected_map = np.full_like(self.target_map, fill_value=114514, dtype=np.float32)
+        detected_map[last_detected_map != 114514] = self.target_map[last_detected_map != 114514]
+        avatar_path = [(log.get_index_x(), log.get_index_y()) for log in self.result_trail]
+
+        max_radius = max(self.target_map.shape)
+        file_counter = self.path_finding_counter
+
+        for step in range(expansion_steps + 1):
+            current_radius = (step / expansion_steps) * max_radius
+            for i in range(self.target_map.shape[0]):
+                for j in range(self.target_map.shape[1]):
+                    if np.sqrt((i - final_pos[0]) ** 2 + (j - final_pos[1]) ** 2) <= current_radius:
+                        detected_map[i, j] = self.target_map[i, j]
+
+            save_path = os.path.join(self.result_directory_path, f"elevation_map_{file_counter}.png")
+            print(f"Saving transition step {step + 1}/{expansion_steps} to {save_path}")
+
+            # Show colorbar and label only for the final step
+            show_colorbar = step == expansion_steps
+            show_label = step == expansion_steps
+
+            self.plot_elevation_map(
+                elevation_data=detected_map,
+                undetected_val=114514,
+                avatar_positions=avatar_path,
+                save_path=save_path,
+                show_colorbar=show_colorbar,
+                show_label=show_label  # Pass flag to display labels only in the final step
+            )
+
+            file_counter += 1
+
+        print(f"Final full map saved as elevation_map_{file_counter - 1}.png")
+        self.path_finding_counter = file_counter
+
+    def plot_full_map_set_map(self, save_path=None, task=None):
+        fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
+
+        terrain_map = np.array(self.target_map, dtype=np.float32)
+        cmap = plt.get_cmap('terrain')
+        norm = mcolors.Normalize(vmin=self.map_minValue, vmax=self.map_maxValue)
+
+        ls = LightSource(azdeg=315, altdeg=45)
+        hillshade = ls.hillshade(terrain_map, vert_exag=1, dx=1, dy=1)
+
+        ax.imshow(hillshade, cmap='gray', alpha=0.5)
+        img = ax.imshow(terrain_map, cmap=cmap, norm=norm, alpha=0.7)
+        ax.contour(terrain_map, levels=15, colors='black', linewidths=0.5, alpha=0.5)
+
+        ax.set_axis_off()
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+
+        axins = inset_axes(ax, width="3%", height="30%", loc='upper right', borderpad=2)
+        cbar = plt.colorbar(img, cax=axins)
+        cbar.ax.yaxis.set_label_position('left')
+        cbar.ax.yaxis.set_ticks_position('left')
+        cbar.set_label("")
+
+        if task:
+            start_x, start_y = task.start_row, task.start_col
+            end_x, end_y = task.dest_row, task.dest_col
+
+            ax.plot(start_y, start_x, marker='o', color='green', markersize=8, label="Start")  # Green Circle for Start
+            ax.plot(end_y, end_x, marker='X', color='red', markersize=8, label="End")  # Red X for End
+
+            legend_ax = inset_axes(ax, width="10%", height="8%", loc='lower right', borderpad=1.5)
+            legend_ax.set_xticks([])
+            legend_ax.set_yticks([])
+            legend_ax.set_frame_on(False)
+            legend_ax.text(0, 0.6, "Start", color="green", fontsize=10, fontweight='bold', verticalalignment='center')
+            legend_ax.text(0, 0.2, "End", color="red", fontsize=10, fontweight='bold', verticalalignment='center')
+
+        if save_path:
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+            plt.close(fig)
+            print(f"Saved static full map to {save_path}")
+        else:
+            plt.show()
+
+
 
 
 

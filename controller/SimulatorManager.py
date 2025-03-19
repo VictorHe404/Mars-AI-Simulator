@@ -39,14 +39,28 @@ class SimulatorManager:
             elif command["command"] == "sbrain":
                 print("SimulatorManager received set_brain command")
                 self.set_brain(command["brain_name"])
+
+
             elif command["command"] == "move":
                 print("SimulatorManager received move command")
                 self.set_task(command["target"][0], command["target"][1],
                               command["target"][2], command["target"][3])
                 self.run_simulator()
+
+            elif command["command"] == "stask":
+                print("SimulatorManager received stask command")
+                self.set_task(command["x1"], command["y1"], command["x2"], command["y2"])
+            elif command["command"] == "run":
+                print("SimulatorManager received run command")
+                self.run_simulator()
+
+
             elif command["command"] == "sdb":
                 print("SimulatorManager received sdb command")
                 self.set_database(command["state"] == "true")
+
+
+
             elif command["command"] == "lavatar":
                 print("SimulatorManager received lavatar command")
                 self.list_avatars()
@@ -56,6 +70,14 @@ class SimulatorManager:
             elif command["command"] == "lbrain":
                 print("SimulatorManager received lbrain command")
                 self.list_brains()
+
+
+
+            #fast_task a1 Louth_Crater_Sharp greedy -t 20 20 35 45
+            elif command["command"] == "fast_task":
+                print("SimulatorManager received fast_task command")
+                self.fast_task(command)
+
 
 
     def initialize(self, avatar_name: str | None) -> None:
@@ -189,6 +211,48 @@ class SimulatorManager:
         self.event_manager.post_event(
             ActionStatusEvent(True, message, "list_maps")
         )
+
+    def fast_task(self, command: dict) -> None:
+        """
+        Performs a fast task setup, including setting the avatar, map, brain, and movement task.
+        """
+
+        avatar_name = command["avatar_name"]
+        map_name = command["map_name"]
+        brain_name = command["brain_name"]
+        target = command["target"]  # List of 4 integers: x1, y1, x2, y2
+
+        print(f"Fast task setup started: Avatar={avatar_name}, Map={map_name}, Brain={brain_name}, Target={target}")
+
+        # Step 1: Set the avatar
+        if not self.simulator.set_avatar(avatar_name):
+            error_message = f"[fast_task] Failed: Avatar '{avatar_name}' does not exist."
+            self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
+            return
+
+        # Step 2: Set the map
+        if not self.simulator.set_map(map_name):
+            error_message = f"[fast_task] Failed: Map '{map_name}' not found."
+            self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
+            return
+
+        # Step 3: Set the brain
+        if not self.simulator.set_brain(brain_name):
+            error_message = f"[fast_task] Failed: Brain '{brain_name}' not recognized."
+            self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
+            return
+
+        # Step 4: Set the movement task
+        if not self.simulator.set_task(target[0], target[1], target[2], target[3]):
+            error_message = f"[fast_task] Failed: Invalid movement coordinates ({target[0]}, {target[1]}) → ({target[2]}, {target[3]})."
+            self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
+            return
+
+        # Step 5: Run the simulation
+        self.run_simulator()
+
+        success_message = f"[fast_task] Successfully configured and started simulation with Avatar='{avatar_name}', Map='{map_name}', Brain='{brain_name}', Task=({target[0]}, {target[1]}) → ({target[2]}, {target[3]})."
+        self.event_manager.post_event(ActionStatusEvent(True, success_message, "fast_task"))
 
 
 
