@@ -216,6 +216,7 @@ class Simulator:
             if self.target_brain is not None:
                 self.target_brain.set_original_map(self.target_map)
             #self.current_map = t_map
+            '''
             save_path = os.path.join(self.result_directory_path_2, f'set_map.png')
             if os.path.exists(save_path):
                 try:
@@ -224,6 +225,7 @@ class Simulator:
                 except Exception as e:
                     print(f"Error deleting file {save_path}: {e}")
             self.plot_full_map_set_map(save_path, self.target_task)
+            '''
 
             return True
 
@@ -246,6 +248,7 @@ class Simulator:
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
         print("Debug Print")
+        '''
         if len(self.target_map) != 0:
             save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
             if os.path.exists(save_path):
@@ -255,6 +258,7 @@ class Simulator:
                 except Exception as e:
                     print(f"Error deleting file {save_path}: {e}")
             self.plot_full_map_set_map(save_path, self.target_task)
+        '''
         return True
 
     def get_brain_names(self):
