@@ -13,23 +13,23 @@ from view.CommandPromptWidget import CommandPromptWidget
 from view.MapModel import MapModel, MiniMapView, MainMapView
 from view.TaskBarWidget import TaskbarWidget
 
-# --- Main Application ---
+
 class MainPage(QMainWindow):
     command_signal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Map Interface")
+
         # Get screen size
         screen = QApplication.primaryScreen()
         rect = screen.availableGeometry()
 
-        # Dynamically set width and height based on screen size (90% of screen size)
-        self.main_page_width = int(rect.width()*0.5)
-        self.main_page_height = int(rect.height()*0.5)
-        # self.showFullScreen()
-        # Set the geometry of the window
+        # Dynamically set width and height based on screen size (50%)
+        self.main_page_width = int(rect.width() * 0.5)
+        self.main_page_height = int(rect.height() * 0.5)
         self.setGeometry(50, 50, self.main_page_width, self.main_page_height)
+
         # Model and Controller
         self.model = MapModel()
 
@@ -43,10 +43,25 @@ class MainPage(QMainWindow):
 
         # Map Layout
         map_layout = QHBoxLayout()
+
+        # Mini map + Property widget on left
+        mini_map_container = QVBoxLayout()
         self.mini_map = MiniMapView(self.model)
+
+        # Property widget (read-only text field)
+        self.property_widget = QTextEdit()
+        self.property_widget.setReadOnly(True)
+        self.property_widget.setFixedWidth(self.mini_map.width())
+        self.property_widget.setFixedHeight(200)
+        self.property_widget.setPlaceholderText("Properties will be displayed here...")
+
+        mini_map_container.addWidget(self.mini_map)
+        mini_map_container.addWidget(self.property_widget)
+
+        # Main map on the right
         self.main_map = MainMapView(self.model)
 
-        map_layout.addWidget(self.mini_map)
+        map_layout.addLayout(mini_map_container)
         map_layout.addWidget(self.main_map)
 
         # Command Prompt
@@ -63,10 +78,9 @@ class MainPage(QMainWindow):
         # Timer to update image every 100ms (10 FPS)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_image)
-        self.timer.start(100)  # 100ms = 10 images per second
+        self.timer.start(100)
         self.pic_counter = float('inf')
-        self.update_image()  # Display first image
-
+        self.update_image()
 
     def process_command(self, command):
         """Emit the command to Visualizer."""
@@ -80,8 +94,7 @@ class MainPage(QMainWindow):
         """Update the map image."""
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
-        if os.path.exists(os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')):
-            # self.mini_map.update_minimap(pic_path)
+        if os.path.exists(pic_path):
             self.main_map.update_mainmap(pic_path)
             self.pic_counter += 1
         else:
@@ -94,6 +107,11 @@ class MainPage(QMainWindow):
 
     def start_visualizer(self):
         self.pic_counter = 0
+
+    def display_properties(self, text: str):
+        """Display text in the property widget below the mini map."""
+        self.property_widget.setPlainText(text)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
