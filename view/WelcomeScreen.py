@@ -13,7 +13,16 @@ class WelcomePage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mars AI - Welcome")
-        self.setGeometry(100, 100, 800, 600)
+
+        window_width = 700
+        window_height = 450
+        self.setFixedSize(window_width, window_height)
+
+        # Set at the middle of the screen
+        screen = self.screen().availableGeometry()
+        center_x = screen.center().x() - window_width // 2
+        center_y = screen.center().y() - window_height // 2
+        self.move(center_x, center_y)
 
         # Central widget
         central_widget = QWidget()

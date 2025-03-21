@@ -20,8 +20,8 @@ class MiniMapView(QGraphicsView):
         self.model = model
         self.scene = QGraphicsScene()
         self.setScene(self.scene)
-        self.mini_map_height = 160
-        self.mini_map_width = 160
+        self.mini_map_height = 250
+        self.mini_map_width = 250
         self.background_item = None  # Initialize background item
 
         self.setFixedSize(self.mini_map_height, self.mini_map_width)
@@ -37,7 +37,7 @@ class MiniMapView(QGraphicsView):
         if os.path.exists(image_path):
             mini_map_background = QPixmap(image_path)
             mini_map_background = mini_map_background.scaled(
-                self.mini_map_height - 5, self.mini_map_width - 5,
+                self.mini_map_height - 4, self.mini_map_width - 4,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             )
@@ -62,7 +62,7 @@ class MiniMapView(QGraphicsView):
 
             mini_map_background = QPixmap(image_path)
             mini_map_background = mini_map_background.scaled(
-                self.mini_map_height - 5, self.mini_map_width - 5,
+                self.mini_map_height - 4, self.mini_map_width - 4,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             )
@@ -98,7 +98,7 @@ class MainMapView(QGraphicsView):
         if os.path.exists(image_path):
             main_map_background = QPixmap(image_path)
             main_map_background = main_map_background.scaled(
-                self.main_map_width - 5, self.main_map_height - 5,
+                self.main_map_width - 4, self.main_map_height - 4,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             )
@@ -125,7 +125,7 @@ class MainMapView(QGraphicsView):
 
             main_map_background = QPixmap(image_path)
             main_map_background = main_map_background.scaled(
-                self.main_map_width - 5, self.main_map_height - 5,
+                self.main_map_width - 4, self.main_map_height - 4,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             )
