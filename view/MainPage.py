@@ -84,6 +84,7 @@ class MainPage(QMainWindow):
 
     def process_command(self, command):
         """Emit the command to Visualizer."""
+        self.command_prompt.display_output(command)
         self.command_signal.emit(command)
 
     def display_output(self, message):
@@ -104,6 +105,9 @@ class MainPage(QMainWindow):
         pic_path = os.path.join("viewImage", mini_map_image_path)
         print(pic_path)
         self.mini_map.update_minimap(pic_path)
+
+    def update_mainmap(self, main_map_image_path):
+        self.main_map.update_mainmap(main_map_image_path)
 
     def start_visualizer(self):
         self.pic_counter = 0

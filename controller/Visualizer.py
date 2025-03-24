@@ -12,6 +12,10 @@ class Visualizer(QObject):
     """
     Visualizer: visualize the event
     """
+    display_output_signal = pyqtSignal(str)
+    update_mainmap_signal = pyqtSignal(str)
+    update_minimap_signal = pyqtSignal(str)
+    start_visualizer_signal = pyqtSignal()
     def __init__(self, event_manager: EventManager) -> None:
         super().__init__()
         self.event_manager = event_manager
@@ -24,6 +28,10 @@ class Visualizer(QObject):
         self.main_page.command_signal.connect(self.execute_command)
         # Thread pool for concurrent task execution
         self.thread_pool = QThreadPool.globalInstance()
+        self.display_output_signal.connect(self.main_page.display_output)
+        self.update_mainmap_signal.connect(self.main_page.update_mainmap)
+        self.update_minimap_signal.connect(self.main_page.update_minimap)
+        self.start_visualizer_signal.connect(self.main_page.start_visualizer)
 
     def on_start(self):
         """
@@ -65,32 +73,20 @@ class Visualizer(QObject):
         elif isinstance(event, InitialEvent):
             self.initialize()
         elif isinstance(event, ActionStatusEvent):
-            print("status message",event.msg)
-            self.main_page.display_output(event.msg)
+            print("status message", event.msg)
+            self.display_output_signal.emit(event.msg)  # via signal to prevent the timer started from other thread
         elif isinstance(event, VisualizerEvent):
             if event.msg == "animation":
-                self.main_page.start_visualizer()
+                self.start_visualizer_signal.emit()  # via signal to prevent the timer started from other thread
             elif event.msg == "minimap":
-                self.main_page.update_minimap("Louth_Crater_minimap.png")
+                if event.map_path in ["Louth_Crater_Normal", "Louth_Crater_Sharp"]:
+                    self.update_minimap_signal.emit("Louth_Crater_minimap.png")
+            elif event.msg in ["main_map", "task"]:
+                self.update_mainmap_signal.emit(event.map_path)
 
     def __str__(self):
         return "Visualizer"
 
-    # def visualize(self, pic_path: str) -> None:
-    #     """
-    #     Visualize the picture
-    #     """
-    #     pic_path = os.path.join(os.getcwd(), pic_path)
-    #     print(f"Visualizer is visualizing {pic_path}")
-    #     picture_counter = 0
-    #     while os.path.exists(os.path.join(pic_path, f'elevation_map_{picture_counter+ 1}.png')):
-    #         path = os.path.join(pic_path, f'elevation_map_{picture_counter + 1}.png')
-    #         if picture_counter == 0:
-    #             self.main_page.main_map.init_mainmap(path)
-    #         else:
-    #             self.main_page.main_map.update_mainmap(path)
-    #         time.sleep(0.2)
-    #         picture_counter += 1
 
 class CommandWorker(QRunnable):
     """Worker task that processes commands in parallel using QThreadPool."""

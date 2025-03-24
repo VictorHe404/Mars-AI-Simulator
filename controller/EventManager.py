@@ -21,12 +21,6 @@ class InitialEvent(Event):
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
-class TicketEvent(Event):
-    """
-    Ticket Event
-    """
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
 
 class SimulatorEvent(Event):
     """
@@ -35,13 +29,21 @@ class SimulatorEvent(Event):
     def __init__(self, cmd: dict[str, str]) -> None:
         self.cmd = cmd
 
-class CommandEvent(ABC):
+class CommandEvent(Event):
     """
     Super class of Command Event
     """
     def __init__(self, command: str) -> None:
         self.command = command
 
+
+class VisualizerEvent(Event):
+    """
+    Visualizer Event
+    """
+    def __init__(self, msg: str, map_path: str) -> None:
+        self.msg = msg
+        self.map_path = map_path
 
 class ActionStatusEvent(Event):
     """
@@ -51,14 +53,6 @@ class ActionStatusEvent(Event):
         self.status = status
         self.msg = msg
         self.action_name = action_name
-
-class VisualizerEvent(Event):
-    """
-    Visualizer Event
-    """
-    def __init__(self, msg: str, map_path: str) -> None:
-        self.msg = msg
-        self.map_path = map_path
 
 
 class EventManager:

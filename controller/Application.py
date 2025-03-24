@@ -26,8 +26,6 @@ class Application:
         elif isinstance(event, InitialEvent):
             print("Application is initializing")
             self.running = True
-        elif isinstance(event, TicketEvent):
-            pass
 
     def run(self) -> None:
         """

@@ -3,6 +3,7 @@ from xmlrpc.client import boolean
 from model.simulator import *
 from .EventManager import *
 import threading
+import os
 
 class SimulatorManager:
 
@@ -146,19 +147,24 @@ class SimulatorManager:
         else:
             success_message = f"[smap] Map '{map_name}' set successfully."
             self.event_manager.post_event(VisualizerEvent("minimap", map_name))
+            cache_path = os.path.join(os.getcwd(), 'cache_directory_2')
+            pic_path = os.path.join(cache_path, f'set_map.png')
+            self.event_manager.post_event(VisualizerEvent("main_map", pic_path))
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_map"))
 
     def set_task(self, start_row, start_col, destination_row, destination_col) -> None:
         is_set = self.simulator.set_task(start_row, start_col,
                                          destination_row, destination_col)
-        self.event_manager.post_event(ActionStatusEvent(True, "[stask] Task set successfully.", "set_task"))
         if not is_set:
             error_message = f"[stask] Task set failed due to invalid coordinates: ({start_row}, {start_col}) → ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_task"))
         else:
             success_message = f"[stask] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col})."
+            cache_path = os.path.join(os.getcwd(), 'cache_directory_2')
+            pic_path = os.path.join(cache_path, f'set_task_map.png')
+            self.event_manager.post_event(VisualizerEvent("task", pic_path))
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_task"))
 
