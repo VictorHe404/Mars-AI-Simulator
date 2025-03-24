@@ -406,6 +406,25 @@ class Avatar:
             database_available=database_available
         )
 
+    def __str__(self):
+        info = [
+            f"Avatar Profile: {self.name} (ID: {self.id})",
+            "======================================",
+            f"Weight: {self.weight} kg",
+            f"Material: {self.material}",
+            f"Description: {self.description}",
+            "",
+            f"Battery Capacity: {self.battery_capacity} mAh",
+            f"Consumption Rate: {self.battery_consumption_rate} mAh/m",
+            f"Driving Force: {self.driving_force} N",
+            f"Max Speed: {self.speed} m/s",
+            f"Max Climbing Capability: {round(self.max_slope, 2)} m",
+            f"Recharge Rate: {self.energy_recharge_rate} mAh/s",
+            "",
+            f"Sensors: {', '.join(sensor.name for sensor in self.get_sensors()) if self.get_sensors() else 'None'}"
+        ]
+        return "\n".join(info)
+
     def get_name(self):
         return self.name
     def get_weight(self):

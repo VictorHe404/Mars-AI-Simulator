@@ -2,6 +2,8 @@
 import glob
 import os
 import time
+import csv
+import uuid
 from collections import deque
 from itertools import cycle
 
@@ -18,6 +20,8 @@ from model.simulator.task import Task
 from model.avatar import Avatar, DetectionMask,  Sensor
 import model.brain as Brain
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+
 
 
 
@@ -125,6 +129,24 @@ class Simulator:
         else:
             return [avatar.name for avatar in self.avatars]
 
+    def get_target_avatar_characteristics(self):
+        if self.target_avatar is None:
+            return False, ""
+        else:
+            return True,self.target_avatar.__str__()
+
+    def get_avatar_characteristics(self, name):
+        if self.database_available:
+            avatar = Avatar.get_avatar_by_name(name)
+            if avatar:
+                return True, avatar.__str__()
+            else:
+                return False, ""
+        else:
+            for avatar in self.avatars:
+                if avatar.name == name:
+                    return True, avatar.__str__()
+            return False, ""
 
     def add_avatar(self,name):
         """
@@ -216,7 +238,6 @@ class Simulator:
             if self.target_brain is not None:
                 self.target_brain.set_original_map(self.target_map)
             #self.current_map = t_map
-            '''
             save_path = os.path.join(self.result_directory_path_2, f'set_map.png')
             if os.path.exists(save_path):
                 try:
@@ -225,7 +246,6 @@ class Simulator:
                 except Exception as e:
                     print(f"Error deleting file {save_path}: {e}")
             self.plot_full_map_set_map(save_path, self.target_task)
-            '''
 
             return True
 
@@ -248,17 +268,22 @@ class Simulator:
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
         print("Debug Print")
-        '''
+
         if len(self.target_map) != 0:
+            print("Debug Prin2")
             save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
             if os.path.exists(save_path):
                 try:
+                    print("Debug Prin3")
                     os.remove(save_path)
                     print(f"Deleted existing map file: {save_path}")
+                    print("Debug Print4")
                 except Exception as e:
+                    print("Debug Print5")
                     print(f"Error deleting file {save_path}: {e}")
+            print("Debug Print6")
             self.plot_full_map_set_map(save_path, self.target_task)
-        '''
+
         return True
 
     def get_brain_names(self):
@@ -310,6 +335,7 @@ class Simulator:
             self.target_brain.reset()
             self.path_finding_counter = 0
             self.result_trail, self.path_finding_result=self.target_brain.run()
+            self.export_logs_to_csv()
             self.plot_results()
             self.plot_full_map()
             self.save_log_to_file()
@@ -318,6 +344,29 @@ class Simulator:
             print("The target brain is not ready yet")
             return False, False
 
+    def run_simulation(self):
+        if self.target_brain.is_ready_to_run():
+            self.path_finding_result = False
+            self.clear_directory()
+            self.target_brain.reset()
+            self.path_finding_counter = 0
+            self.result_trail, self.path_finding_result = self.target_brain.run()
+            estimated_time = int(0.25 * len(self.result_trail))
+            virtual_time = self.result_trail[-1].get_time()
+            return True, self.path_finding_result, estimated_time, virtual_time
+        else:
+            print("The target brain is not ready yet")
+            return False, False, 0, 0
+
+    def process_simulation_output(self):
+        if not self.result_trail:
+            print("No result trail to process.")
+            return
+
+        self.export_logs_to_csv()
+        self.plot_results()
+        self.plot_full_map()
+        self.save_log_to_file()
 
     # The overall function to plot the result
     def plot_results(self):
@@ -340,7 +389,7 @@ class Simulator:
             self.path_finding_counter += 1
 
     def plot_elevation_map(self, elevation_data, undetected_val, avatar_positions=None,
-                           save_path=None, show_colorbar=False, show_label=False):
+                           save_path=None, show_colorbar=False):
         fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
 
         elevation_data = np.array(elevation_data, dtype=np.float32)
@@ -391,11 +440,10 @@ class Simulator:
                 else:
                     marker = '^' if dy < 0 else 'v'
             else:
-                marker = '>'  # Default to right
+                marker = '>'
 
             ax.plot(curr_pos[1], curr_pos[0], marker=marker, color='red', markersize=8)
 
-        # **Plot start and end locations based on `self.target_task`**
         if self.target_task:
             start_x, start_y = self.target_task.start_row, self.target_task.start_col
             end_x, end_y = self.target_task.des_row, self.target_task.des_col
@@ -408,8 +456,6 @@ class Simulator:
 
         ax.set_axis_off()
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-        # **Show colorbar and labels only in the final frame**
         if show_colorbar:
             axins = inset_axes(ax, width="3%", height="30%", loc='upper right', borderpad=2)
             cbar = plt.colorbar(img, cax=axins)
@@ -417,12 +463,6 @@ class Simulator:
             cbar.ax.yaxis.set_ticks_position('left')
             cbar.set_label("")
 
-            if show_label:
-                # **Create start and end labels next to the color bar**
-                axins.text(-1.5, 1.05, "Start", color='green', fontsize=10, ha='right', va='center',
-                           transform=axins.transAxes)
-                axins.text(-1.5, -0.05, "End", color='blue', fontsize=10, ha='right', va='center',
-                           transform=axins.transAxes)
 
         if save_path:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -504,7 +544,7 @@ class Simulator:
 
             # Show colorbar and label only for the final step
             show_colorbar = step == expansion_steps
-            show_label = step == expansion_steps
+            show_label = False
 
             self.plot_elevation_map(
                 elevation_data=detected_map,
@@ -512,7 +552,6 @@ class Simulator:
                 avatar_positions=avatar_path,
                 save_path=save_path,
                 show_colorbar=show_colorbar,
-                show_label=show_label  # Pass flag to display labels only in the final step
             )
 
             file_counter += 1
@@ -544,19 +583,14 @@ class Simulator:
         cbar.ax.yaxis.set_ticks_position('left')
         cbar.set_label("")
 
-        if task:
-            start_x, start_y = task.start_row, task.start_col
-            end_x, end_y = task.dest_row, task.dest_col
 
-            ax.plot(start_y, start_x, marker='o', color='green', markersize=8, label="Start")  # Green Circle for Start
-            ax.plot(end_y, end_x, marker='X', color='red', markersize=8, label="End")  # Red X for End
+        if self.target_task:
+            start_x, start_y = self.target_task.start_row, self.target_task.start_col
+            end_x, end_y = self.target_task.des_row, self.target_task.des_col
 
-            legend_ax = inset_axes(ax, width="10%", height="8%", loc='lower right', borderpad=1.5)
-            legend_ax.set_xticks([])
-            legend_ax.set_yticks([])
-            legend_ax.set_frame_on(False)
-            legend_ax.text(0, 0.6, "Start", color="green", fontsize=10, fontweight='bold', verticalalignment='center')
-            legend_ax.text(0, 0.2, "End", color="red", fontsize=10, fontweight='bold', verticalalignment='center')
+            ax.plot(start_y, start_x, marker='o', color='green', markersize=10, label="Start")
+
+            ax.plot(end_y, end_x, marker='s', color='blue', markersize=10, label="End")
 
         if save_path:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -565,6 +599,57 @@ class Simulator:
             print(f"Saved static full map to {save_path}")
         else:
             plt.show()
+
+    def export_logs_to_csv(self, csv_filename="log_export.csv"):
+        if not self.result_trail:
+            print("No result trail to export.")
+            return
+
+        file_path = os.path.join(self.result_directory_path, csv_filename)
+        os.makedirs(self.result_directory_path, exist_ok=True)
+
+        # Always delete the old file
+        if os.path.isfile(file_path):
+            try:
+                os.remove(file_path)
+                print(f"Old log file deleted: {file_path}")
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+                return
+
+        friction = self.target_environment.get_friction() if self.target_environment else 0
+
+        with open(file_path, mode='w', newline='') as csvfile:
+            fieldnames = [
+                "log_id", "x", "y", "time", "energy",
+                "elevation", "friction", "local_grid"
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for log_id, log in enumerate(self.result_trail):
+                x = log.get_index_x()
+                y = log.get_index_y()
+                detect_map = log.get_detect_map()
+
+                elevation = (
+                    detect_map[x][y] if 0 <= x < len(detect_map) and 0 <= y < len(detect_map[0])
+                    else "N/A"
+                )
+
+                writer.writerow({
+                    "log_id": log_id,
+                    "x": x,
+                    "y": y,
+                    "time": log.get_time(),
+                    "energy": log.get_energy(),
+                    "elevation": elevation,
+                    "friction": friction,
+                    "local_grid": log.local_grid
+                })
+
+        print(f"Logs exported to {file_path}")
+
 
 
 

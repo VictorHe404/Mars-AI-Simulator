@@ -78,6 +78,28 @@ class SimulatorManager:
                 print("SimulatorManager received fast_task command")
                 self.fast_task(command)
 
+            elif command["command"] == "iavatar":
+                print("SimulatorManager received iavatar command")
+                avatar_name = command.get("avatar_name")
+
+                if avatar_name:
+                    found, info = self.simulator.get_avatar_characteristics(avatar_name)
+                    if found:
+                        self.event_manager.post_event(
+                            ActionStatusEvent(True, f"[iavatar] Info for avatar '{avatar_name}':\n{info}", "iavatar"))
+                    else:
+                        self.event_manager.post_event(
+                            ActionStatusEvent(False, f"[iavatar] Avatar '{avatar_name}' not found.", "iavatar"))
+                else:
+                    found, info = self.simulator.get_target_avatar_characteristics()
+                    if found:
+                        self.event_manager.post_event(
+                            ActionStatusEvent(True, f"[iavatar] Info for currently selected avatar:\n{info}",
+                                              "iavatar"))
+                    else:
+                        self.event_manager.post_event(
+                            ActionStatusEvent(False, "[iavatar] No avatar is currently selected.", "iavatar"))
+
 
 
     def initialize(self, avatar_name: str | None) -> None:
@@ -130,13 +152,13 @@ class SimulatorManager:
     def set_task(self, start_row, start_col, destination_row, destination_col) -> None:
         is_set = self.simulator.set_task(start_row, start_col,
                                          destination_row, destination_col)
-        self.event_manager.post_event(ActionStatusEvent(True, "[move] Task set successfully.", "set_task"))
+        self.event_manager.post_event(ActionStatusEvent(True, "[stask] Task set successfully.", "set_task"))
         if not is_set:
-            error_message = f"[move] Task set failed due to invalid coordinates: ({start_row}, {start_col}) → ({destination_row}, {destination_col})."
+            error_message = f"[stask] Task set failed due to invalid coordinates: ({start_row}, {start_col}) → ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, error_message, "set_task"))
         else:
-            success_message = f"[move] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col}). \n start calculating the path."
+            success_message = f"[stask] Task set successfully from ({start_row}, {start_col}) to ({destination_row}, {destination_col})."
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_task"))
 
@@ -151,19 +173,46 @@ class SimulatorManager:
             self.event_manager.post_event(
                 ActionStatusEvent(is_set, success_message, "set_brain"))
 
+    '''
     def run_simulator(self) -> None:
         is_running, running_result = self.simulator.run()
         if not is_running:
-            error_message = "[move] Simulator failed to start due to unset elements (missing map, avatar, or task)."
+            error_message = "[run] Simulator failed to start due to unset elements (missing map, avatar, or task)."
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, error_message, "run_simulator"))
         else:
-            success_message = "[move] Simulator finished successfully, start to animate the process.\n"
-            result_message = f"[move] Task completed." if running_result else "[move] Task failed."
+            success_message = "[run] Simulator finished successfully, start to animate the process.\n"
+            result_message = f"[run] Task completed." if running_result else "[move] Task failed."
             message =  result_message + success_message
             self.event_manager.post_event(
                 ActionStatusEvent(is_running, message, "run_simulator"))
             self.event_manager.post_event(VisualizerEvent("animation", self.simulator.target_map))
+    '''
+
+    def run_simulator(self) -> None:
+        is_running, running_result, estimated_time, virtual_time = self.simulator.run_simulation()
+
+        if not is_running:
+            error_message = "[run] Simulator failed to start due to unset elements (missing map, avatar, or task)."
+            self.event_manager.post_event(
+                ActionStatusEvent(False, error_message, "run_simulator")
+            )
+            return
+        pre_animation_msg = f"[run] The task took {virtual_time} seconds of simulate time to finish.\n"
+        pre_animation_msg += f"[run] Task {'completed' if running_result else 'failed'}, starting processing animation...\n"
+        pre_animation_msg += f"[run] Estimated duration: ~{estimated_time} seconds."
+        self.event_manager.post_event(ActionStatusEvent(is_running,pre_animation_msg, "run_simulator"))
+        self.simulator.process_simulation_output()
+        success_msg = "[run] Simulator finished successfully, start to animate the process."
+        #result_msg = "[run] Task completed." if running_result else "[move] Task failed."
+        final_msg = success_msg
+        self.event_manager.post_event(
+            ActionStatusEvent(True, final_msg, "run_simulator")
+        )
+        self.event_manager.post_event(
+            VisualizerEvent("animation", self.simulator.target_map)
+        )
+
 
 
     def set_database(self, database_available: bool) -> None:

@@ -58,6 +58,9 @@ class CommandController:
         fast_task_parser.add_argument("-t", "--target", type=int, nargs=4, required=True,
                                       help="Target position as four integers (x1, y1, x2, y2)")
 
+        iavatar_parser = subparsers.add_parser("iavatar", help="Show the information of the avatar")
+        iavatar_parser.add_argument("avatar_name", nargs="?", default=None, help="Name of the avatar (optional)")
+
 
 
     def notify(self, event: Event) -> None:
