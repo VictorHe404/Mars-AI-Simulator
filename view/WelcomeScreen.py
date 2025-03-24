@@ -1,10 +1,10 @@
 import sys
 import webbrowser
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QPushButton, QLabel, QMessageBox, QVBoxLayout, QWidget, QHBoxLayout
+    QApplication, QMainWindow, QPushButton, QLabel, QMessageBox, QVBoxLayout, QWidget, QHBoxLayout, QDialog, QTextEdit
 )
-from PyQt6.QtGui import QPixmap, QPalette, QBrush
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QPixmap, QPalette, QBrush, QDesktopServices
+from PyQt6.QtCore import Qt, pyqtSignal, QUrl
 import os
 
 class WelcomePage(QMainWindow):
@@ -107,11 +107,31 @@ class WelcomePage(QMainWindow):
 
     def show_instructions(self):
         """Display instructions for the application."""
-        QMessageBox.information(
-            self,
-            "Instructions",
-            "This page contains frequently used commands and basic instructions to help navigate the application effectively."
-        )
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(base_path, 'Instruction.txt')
+
+        try:
+            with open(path, 'r', encoding='utf-8') as file:
+                content = file.read()
+        except Exception as e:
+            content = f"Could not load instructions:\n{e}"
+
+        # Create a new window
+        window = QWidget()
+        window.setWindowTitle("Instruction")
+        window.resize(600, 400)
+
+        layout = QVBoxLayout()
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setPlainText(content)
+
+        layout.addWidget(text_edit)
+
+        window.setLayout(layout)
+        window.show()
+        self.instruction_window = window
 
     def open_github(self):
         """Open the project's GitHub repository."""

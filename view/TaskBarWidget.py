@@ -1,6 +1,7 @@
+import os
 import webbrowser
 from PyQt6.QtWidgets import (
-    QHBoxLayout, QMessageBox, QWidget, QPushButton, QMenu
+    QHBoxLayout, QMessageBox, QWidget, QPushButton, QMenu, QVBoxLayout, QTextEdit
 )
 from PyQt6.QtGui import QAction
 
@@ -54,7 +55,7 @@ class TaskbarWidget(QWidget):
         self.taskbar_layout.addWidget(self.avatar_button)
 
     def create_instruction_button(self):
-        """Create Instruction button."""
+        """Create Instruction.txt button."""
         self.instruction_button = QPushButton("Instruction")
         self.instruction_button.setFlat(True)
         self.instruction_button.setFixedHeight(40)
@@ -110,12 +111,31 @@ class TaskbarWidget(QWidget):
         QMessageBox.information(self, "Set Avatar", "Set Avatar feature is under development.")
 
     def show_instructions(self):
-        QMessageBox.information(
-            self, "Instructions",
-            "1. Use the navigation taskbar to explore features.\n"
-            "2. Input commands in the terminal for advanced controls.\n"
-            "3. Check settings to personalize the experience."
-        )
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(base_path, 'Instruction.txt')
+
+        try:
+            with open(path, 'r', encoding='utf-8') as file:
+                content = file.read()
+        except Exception as e:
+            content = f"Could not load instructions:\n{e}"
+
+        # Create a new window
+        window = QWidget()
+        window.setWindowTitle("Instruction")
+        window.resize(600, 400)
+
+        layout = QVBoxLayout()
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setPlainText(content)
+
+        layout.addWidget(text_edit)
+
+        window.setLayout(layout)
+        window.show()
+        self.instruction_window = window
 
     def open_github_link(self):
         try:
