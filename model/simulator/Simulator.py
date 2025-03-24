@@ -296,7 +296,7 @@ class Simulator:
 
     # Set the brain
     def set_brain(self, brain_name):
-        previous_brain = self.target_brain  # Store reference to the current brain if exists
+        previous_brain = self.target_brain
 
         match brain_name:
             case "greedy":
@@ -542,9 +542,7 @@ class Simulator:
             save_path = os.path.join(self.result_directory_path, f"elevation_map_{file_counter}.png")
             print(f"Saving transition step {step + 1}/{expansion_steps} to {save_path}")
 
-            # Show colorbar and label only for the final step
             show_colorbar = step == expansion_steps
-            show_label = False
 
             self.plot_elevation_map(
                 elevation_data=detected_map,
@@ -608,7 +606,6 @@ class Simulator:
         file_path = os.path.join(self.result_directory_path, csv_filename)
         os.makedirs(self.result_directory_path, exist_ok=True)
 
-        # Always delete the old file
         if os.path.isfile(file_path):
             try:
                 os.remove(file_path)

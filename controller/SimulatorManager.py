@@ -269,35 +269,30 @@ class SimulatorManager:
         avatar_name = command["avatar_name"]
         map_name = command["map_name"]
         brain_name = command["brain_name"]
-        target = command["target"]  # List of 4 integers: x1, y1, x2, y2
+        target = command["target"]
 
         print(f"Fast task setup started: Avatar={avatar_name}, Map={map_name}, Brain={brain_name}, Target={target}")
 
-        # Step 1: Set the avatar
         if not self.simulator.set_avatar(avatar_name):
             error_message = f"[fast_task] Failed: Avatar '{avatar_name}' does not exist."
             self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
             return
 
-        # Step 2: Set the map
         if not self.simulator.set_map(map_name):
             error_message = f"[fast_task] Failed: Map '{map_name}' not found."
             self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
             return
 
-        # Step 3: Set the brain
         if not self.simulator.set_brain(brain_name):
             error_message = f"[fast_task] Failed: Brain '{brain_name}' not recognized."
             self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
             return
 
-        # Step 4: Set the movement task
         if not self.simulator.set_task(target[0], target[1], target[2], target[3]):
             error_message = f"[fast_task] Failed: Invalid movement coordinates ({target[0]}, {target[1]}) → ({target[2]}, {target[3]})."
             self.event_manager.post_event(ActionStatusEvent(False, error_message, "fast_task"))
             return
 
-        # Step 5: Run the simulation
         self.run_simulator()
 
         success_message = f"[fast_task] Successfully configured and started simulation with Avatar='{avatar_name}', Map='{map_name}', Brain='{brain_name}', Task=({target[0]}, {target[1]}) → ({target[2]}, {target[3]})."
