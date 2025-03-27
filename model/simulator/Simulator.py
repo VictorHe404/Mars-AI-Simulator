@@ -648,6 +648,210 @@ class Simulator:
         print(f"Logs exported to {file_path}")
 
 
+    def generate_simulation_report(self):
+        """
+        Generates a comprehensive text report about the simulator state and simulation results.
+        The report includes information about target_map, target_avatar, target_brain,
+        target_environment, target_task, path_finding_result, and logs from result_trail.
+        """
+        folder = os.path.join(self.result_directory_path)
+        os.makedirs(folder, exist_ok=True)
+
+        # Delete any existing report file
+        report_filename = "simulation_report.txt"
+        file_path = os.path.join(folder, report_filename)
+
+        if os.path.isfile(file_path):
+            try:
+                os.remove(file_path)
+                print(f"Deleted existing report file: {file_path}")
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        with open(file_path, "w") as file:
+            # Report Header
+            file.write("=" * 80 + "\n")
+            file.write(f"SIMULATION REPORT - Generated on {timestamp}\n")
+            file.write("=" * 80 + "\n\n")
+
+            # Map Information
+            file.write("MAP INFORMATION\n")
+            file.write("-" * 80 + "\n")
+            if len(self.target_map) > 0:
+                file.write(f"Map Size: {len(self.target_map)} x {len(self.target_map[0])}\n")
+                file.write(f"Elevation Range: {self.map_minValue:.2f} to {self.map_maxValue:.2f}\n")
+            else:
+                file.write("No map has been set.\n")
+            file.write("\n")
+
+            # Avatar Information
+            file.write("AVATAR INFORMATION\n")
+            file.write("-" * 80 + "\n")
+            if self.target_avatar:
+                file.write(f"Name: {self.target_avatar.name}\n")
+                file.write(f"Weight: {self.target_avatar.weight} kg\n")
+                file.write(f"Material: {self.target_avatar.material}\n")
+                file.write(f"Description: {self.target_avatar.description}\n")
+                file.write(f"Battery Capacity: {self.target_avatar.battery_capacity}\n")
+                file.write(f"Battery Consumption Rate: {self.target_avatar.battery_consumption_rate}\n")
+                file.write(f"Driving Force: {self.target_avatar.driving_force}\n")
+                file.write(f"Speed: {self.target_avatar.speed}\n")
+                file.write(f"Energy Recharge Rate: {self.target_avatar.energy_recharge_rate}\n")
+                file.write(f"Max Climbing Capability: {round(self.target_avatar.max_slope, 2)} m\n")
+
+                file.write("Sensors:\n")
+                if self.database_available:
+                    sensors = self.target_avatar.get_sensors()
+                else:
+                    sensors = self.target_avatar.sensors
+
+                if sensors:
+                    for sensor in sensors:
+                        file.write(f"  - {sensor.name}: Range = {sensor.range}, "
+                                   f"FOV = {sensor.fov}°, Battery Use = {sensor.battery_consumption}\n")
+                else:
+                    file.write("  No sensors attached\n")
+            else:
+                file.write("No avatar has been set.\n")
+            file.write("\n")
+
+            # Brain Information
+            file.write("BRAIN INFORMATION\n")
+            file.write("-" * 80 + "\n")
+            if self.target_brain:
+                brain_type = type(self.target_brain).__name__
+                file.write(f"Type: {brain_type}\n")
+                if brain_type == "BrainGreedy":
+                    file.write("Algorithm: Greedy pathfinding\n")
+                elif brain_type == "BrainAStar":
+                    file.write("Algorithm: A* pathfinding\n")
+            else:
+                file.write("No brain has been set.\n")
+            file.write("\n")
+
+            # Environment Information
+            file.write("ENVIRONMENT INFORMATION\n")
+            file.write("-" * 80 + "\n")
+            if self.target_environment:
+                file.write(f"Friction: {self.target_environment.get_friction()}\n")
+                file.write(f"Gravity: {self.target_environment.get_gravity()}\n")
+                file.write(f"Light Intensity: {self.target_environment.get_light_intensity()}\n")
+
+                # Add friction interpretation based on docstring in Environment class
+                friction_val = self.target_environment.get_friction()
+                if friction_val <= 0.3:
+                    terrain_type = "Ice-covered regions (very slippery, low traction)"
+                elif friction_val <= 0.4:
+                    terrain_type = "Loose sand/dust (slippery, similar to dry sand on Earth)"
+                elif friction_val <= 0.6:
+                    terrain_type = "Compact soil (firmer, more traction)"
+                elif friction_val <= 0.8:
+                    terrain_type = "Rocky terrain (good grip, like gravel)"
+                else:
+                    terrain_type = "High-friction surface"
+                file.write(f"Terrain Type: {terrain_type}\n")
+            else:
+                file.write("No environment has been set.\n")
+            file.write("\n")
+
+            # Task Information
+            file.write("TASK INFORMATION\n")
+            file.write("-" * 80 + "\n")
+            if self.target_task:
+                file.write(f"Start Position: ({self.target_task.start_row}, {self.target_task.start_col})\n")
+                file.write(f"Destination: ({self.target_task.des_row}, {self.target_task.des_col})\n")
+
+                if self.target_map and len(self.target_map) > 0:
+                    if (0 <= self.target_task.start_row < len(self.target_map) and
+                            0 <= self.target_task.start_col < len(self.target_map[0])):
+                        start_elevation = self.target_map[self.target_task.start_row][self.target_task.start_col]
+                        file.write(f"Start Elevation: {start_elevation:.2f}\n")
+
+                    if (0 <= self.target_task.des_row < len(self.target_map) and
+                            0 <= self.target_task.des_col < len(self.target_map[0])):
+                        dest_elevation = self.target_map[self.target_task.des_row][self.target_task.des_col]
+                        file.write(f"Destination Elevation: {dest_elevation:.2f}\n")
+
+                    # Calculate straight-line distance
+                    dx = self.target_task.des_row - self.target_task.start_row
+                    dy = self.target_task.des_col - self.target_task.start_col
+                    distance = (dx ** 2 + dy ** 2) ** 0.5
+                    file.write(f"Straight-line Distance: {distance:.2f} units\n")
+            else:
+                file.write("No task has been set.\n")
+            file.write("\n")
+
+            # Simulation Results
+            file.write("SIMULATION RESULTS\n")
+            file.write("-" * 80 + "\n")
+            file.write(f"Path Finding Success: {self.path_finding_result}\n")
+
+            if self.result_trail:
+                num_steps = len(self.result_trail)
+                total_time = self.result_trail[-1].get_time() if num_steps > 0 else 0
+                start_energy = self.result_trail[0].get_energy() if num_steps > 0 else 0
+                end_energy = self.result_trail[-1].get_energy() if num_steps > 0 else 0
+                energy_used = start_energy - end_energy
+
+                file.write(f"Number of Steps: {num_steps}\n")
+                file.write(f"Total Simulation Time: {total_time:.2f} units\n")
+                file.write(f"Starting Energy: {start_energy:.2f}\n")
+                file.write(f"Ending Energy: {end_energy:.2f}\n")
+                file.write(f"Energy Used: {energy_used:.2f}\n")
+                file.write("\n")
+
+                # Path Details
+                file.write("PATH DETAILS\n")
+                file.write("-" * 80 + "\n")
+                file.write(f"{'Step':>5} | {'Position':^10} | {'Time':>10} | {'Energy':>10} | {'Elevation':>10}\n")
+                file.write("-" * 80 + "\n")
+
+                for i, log in enumerate(self.result_trail):
+                    x, y = log.get_index_x(), log.get_index_y()
+                    time_val = log.get_time()
+                    energy_val = log.get_energy()
+
+                    # Get elevation from detection map if available
+                    elevation = "Unknown"
+                    detect_map = log.get_detect_map()
+                    if detect_map and 0 <= x < len(detect_map) and 0 <= y < len(detect_map[0]):
+                        elev_val = detect_map[x][y]
+                        if elev_val != 114514:  # Check if detected
+                            elevation = f"{elev_val:.2f}"
+
+                    file.write(f"{i:5d} | ({x:3d},{y:3d}) | {time_val:10.2f} | {energy_val:10.2f} | {elevation:>10}\n")
+
+                # Include a sample of local terrain grids for key points
+                if num_steps > 0:
+                    file.write("\n")
+                    file.write("SAMPLE TERRAIN VIEWS\n")
+                    file.write("-" * 80 + "\n")
+
+                    # Get sample indices (start, 25%, 50%, 75%, end)
+                    sample_indices = [0]
+                    if num_steps >= 5:
+                        sample_indices.extend([
+                            num_steps // 4,
+                            num_steps // 2,
+                            (3 * num_steps) // 4
+                        ])
+                    if num_steps > 1:
+                        sample_indices.append(num_steps - 1)
+
+                    for idx in sample_indices:
+                        log = self.result_trail[idx]
+                        file.write(f"Step {idx} - Position ({log.get_index_x()}, {log.get_index_y()}):\n")
+                        file.write(log.get_local_grid_str(size=5))
+                        file.write("\n\n")
+            else:
+                file.write("No simulation results available.\n")
+
+        print(f"Report generated successfully: {file_path}")
+        return file_path
+
+
 
 
 
