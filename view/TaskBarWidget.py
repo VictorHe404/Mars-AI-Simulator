@@ -133,7 +133,7 @@ class TaskbarWidget(QWidget):
             "Create Avatar",
             "Enter Avatar name:"
         )
-        self.set_brain_signal.emit(avatar_name)
+        self.create_avatar_signal.emit(avatar_name)
 
     def create_avatar(self, avatar_name):
         QMessageBox.information(self, "Create Avatar Success", "Avatar " + avatar_name + " is created.")

@@ -47,22 +47,23 @@ class Visualizer(QObject):
 
     #TaskBar Singals
     def list_avatar(self):
-        self.main_page.taskbar.list_avatar("Avatar List")
+        self.event_manager.post_event(SimulatorEvent({"command": "lavatar"}, task_bar=True))
 
     def create_avatar(self, avatar_name):
-        self.main_page.taskbar.create_avatar(avatar_name)
+        self.event_manager.post_event(SimulatorEvent({"command": "cavatar", "avatar_name": avatar_name}, task_bar=True))
 
     def set_avatar(self, avatar_name):
-        self.main_page.taskbar.set_avatar(avatar_name)
+        self.event_manager.post_event(SimulatorEvent({"command": "savatar", "avatar_name": avatar_name}, task_bar=True))
 
     def set_brain(self, brain_name):
-        self.main_page.taskbar.set_brain(brain_name)
+        self.event_manager.post_event(SimulatorEvent({"command": "sbrain", "brain_name": brain_name}, task_bar=True))
 
     def list_map(self):
-        self.main_page.taskbar.list_map("Map List")
+        print("Task bar: list_map")
+        self.event_manager.post_event(SimulatorEvent({"command": "lmap"}, task_bar=True))
 
     def set_map(self, map_name):
-        self.main_page.taskbar.set_map(map_name)
+        self.event_manager.post_event(SimulatorEvent({"command": "smap", "map_name": map_name}, task_bar=True))
 
     def on_start(self):
         """
@@ -105,7 +106,22 @@ class Visualizer(QObject):
             self.initialize()
         elif isinstance(event, ActionStatusEvent):
             print("status message", event.msg)
-            self.display_output_signal.emit(event.msg)  # via signal to prevent the timer started from other thread
+            if not event.task_bar:
+                self.display_output_signal.emit(event.msg)  # via signal to prevent the timer started from other thread
+            else:
+                if event.action_name == "lmap":
+                    self.main_page.taskbar.list_map(event.msg)
+                elif event.action_name == "smap":
+                    self.main_page.taskbar.set_map(event.msg)
+                elif event.action_name == "lavatar":
+                    self.main_page.taskbar.list_avatar(event.msg)
+                elif event.action_name == "cavatar":
+                    self.main_page.taskbar.create_avatar(event.msg)
+                elif event.action_name == "savatar":
+                    self.main_page.taskbar.set_avatar(event.msg)
+                elif event.action_name == "sbrain":
+                    self.main_page.taskbar.set_brain(event.msg)
+
         elif isinstance(event, VisualizerEvent):
             if event.msg == "animation":
                 self.start_visualizer_signal.emit()  # via signal to prevent the timer started from other thread
@@ -114,6 +130,7 @@ class Visualizer(QObject):
                     self.update_minimap_signal.emit("Louth_Crater_minimap.png")
             elif event.msg in ["main_map", "task"]:
                 self.update_mainmap_signal.emit(event.map_path)
+
 
     def __str__(self):
         return "Visualizer"

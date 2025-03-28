@@ -81,6 +81,7 @@ class MainPage(QMainWindow):
         self.timer.start(100)
         self.pic_counter = float('inf')
         self.update_image()
+        self.property = None
 
     def process_command(self, command):
         """Emit the command to Visualizer."""
@@ -97,6 +98,7 @@ class MainPage(QMainWindow):
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
         if os.path.exists(pic_path):
             self.main_map.update_mainmap(pic_path)
+            self.display_properties(self.property.read())
             self.pic_counter += 1
         else:
             self.pic_counter = float('inf')
@@ -110,7 +112,14 @@ class MainPage(QMainWindow):
         self.main_map.update_mainmap(main_map_image_path)
 
     def start_visualizer(self):
+        cache_path = os.path.join(os.getcwd(), 'cache_directory')
+        log_path = os.path.join(cache_path, f'log_export.csv')
+        print(log_path)
+        self.property = open(log_path, 'r')
+        self.display_properties(self.property.read())
+        print(self.property.read())
         self.pic_counter = 0
+
 
     def display_properties(self, text: str):
         """Display text in the property widget below the mini map."""

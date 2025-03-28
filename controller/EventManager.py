@@ -26,8 +26,9 @@ class SimulatorEvent(Event):
     """
     Simulator Event
     """
-    def __init__(self, cmd: dict[str, str]) -> None:
+    def __init__(self, cmd: dict[str, str], task_bar=False) -> None:
         self.cmd = cmd
+        self.task_bar = task_bar
 
 class CommandEvent(Event):
     """
@@ -49,10 +50,11 @@ class ActionStatusEvent(Event):
     """
     Status Event with a boolean status and message
     """
-    def __init__(self, status: bool, msg: str, action_name: str) -> None:
+    def __init__(self, status: bool, msg: str, action_name: str, task_bar= False) -> None:
         self.status = status
         self.msg = msg
         self.action_name = action_name
+        self.task_bar = task_bar
 
 
 class EventManager:
