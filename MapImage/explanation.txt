@@ -13,6 +13,9 @@ Depth (深度) 是相对于 参考高度面 (例如火星表面某个平均高�
 1000x1000test.jpg-是该局部图在真实卫星影像上的实际图片
 
 LouthCraterRealimage.jpg -Louth Crater ice mound（劳斯陨石坑冰丘)的真实卫星影像图片
+
+MarkLouthCraterRealimage.jpg 是一个标注文件，用一个红色正方形框来标注，我们在全地形（
+LouthCraterRealimage.jpg）中 待截取的部分
 ===============================================
 地图像素尺寸和实际尺寸信息
 全地形
