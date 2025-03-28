@@ -82,6 +82,7 @@ class MainPage(QMainWindow):
         self.pic_counter = float('inf')
         self.update_image()
         self.property = None
+        self.property_name = None
 
     def process_command(self, command):
         """Emit the command to Visualizer."""
@@ -98,7 +99,7 @@ class MainPage(QMainWindow):
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
         if os.path.exists(pic_path):
             self.main_map.update_mainmap(pic_path)
-            self.display_properties(self.property.read())
+            self.display_properties(self.property_name + self.property[self.pic_counter])
             self.pic_counter += 1
         else:
             self.pic_counter = float('inf')
@@ -115,9 +116,9 @@ class MainPage(QMainWindow):
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         log_path = os.path.join(cache_path, f'log_export.csv')
         print(log_path)
-        self.property = open(log_path, 'r')
-        self.display_properties(self.property.read())
-        print(self.property.read())
+        file = open(log_path, 'r')
+        self.property_name = file.readline()
+        self.property = [line for line in file.readlines()]
         self.pic_counter = 0
 
 
