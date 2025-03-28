@@ -1,12 +1,12 @@
 contains new terrain data
 the subpart is extracted from Eolian source layers exposed in western Abalos Scopuli and DTEPC_053805_2610_053845_2610_A01.tif
-2 points a and b form the diagonal of the rectangle , in this graph below
+2 points a and b form the diagonal of the square , in this graph below
 
-a-----------------------o       - x direction
-|                       | 
-|                       |
-|                       |
-o-----------------------b
+a--------o       - x direction
+|        | 
+|        |
+|        |
+o--------b
 
 |
 y direction 
@@ -16,9 +16,9 @@ y direction
 
 coordinates value are below : 
 in jpg coordinate system located in DTEPC_053805_2610_053845_2610_A01.jpg
-point a : (x,y) = 256.3,527.2
-point b : (x,y) = 526.1,626.8
+point a : (x,y) = 259.1, 593.9
+point b : (x,y) = 359.1, 693.9
 
 in tif coordinate system located in DTEPC_053805_2610_053845_2610_A01.tif (此tif文件太大，没上传github)
-point a : (x,y) = 2563.00, 5273.00
-point b : (x,y) = 5262.00, 6269.00
+point a : (x,y) = 2591.00, 5940.00
+point b : (x,y) = 3592.00, 6940.00
