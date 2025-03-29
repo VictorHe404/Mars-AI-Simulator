@@ -33,11 +33,13 @@ class Visualizer(QObject):
         self.main_page.taskbar.list_avatar_signal.connect(self.list_avatar)
         self.main_page.taskbar.create_avatar_signal.connect(self.create_avatar)
         self.main_page.taskbar.set_avatar_signal.connect(self.set_avatar)
+        self.main_page.taskbar.list_brain_signal.connect(self.list_brain)
         self.main_page.taskbar.set_brain_signal.connect(self.set_brain)
         #Setting Signal
         self.main_page.taskbar.list_map_signal.connect(self.list_map)
         self.main_page.taskbar.set_map_signal.connect(self.set_map)
-
+        self.main_page.taskbar.report_signal.connect(self.show_report)
+        self.main_page.taskbar.set_animation_speed_signal.connect(self.set_animation_speed)
         # Thread pool for concurrent task execution
         self.thread_pool = QThreadPool.globalInstance()
         self.display_output_signal.connect(self.main_page.display_output)
@@ -55,6 +57,9 @@ class Visualizer(QObject):
     def set_avatar(self, avatar_name):
         self.event_manager.post_event(SimulatorEvent({"command": "savatar", "avatar_name": avatar_name}, task_bar=True))
 
+    def list_brain(self):
+        self.event_manager.post_event(SimulatorEvent({"command": "lbrain"}, task_bar=True))
+
     def set_brain(self, brain_name):
         self.event_manager.post_event(SimulatorEvent({"command": "sbrain", "brain_name": brain_name}, task_bar=True))
 
@@ -64,6 +69,15 @@ class Visualizer(QObject):
 
     def set_map(self, map_name):
         self.event_manager.post_event(SimulatorEvent({"command": "smap", "map_name": map_name}, task_bar=True))
+
+    def show_report(self):
+        #example using instruction.txt
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(base_path, 'Instruction.txt')
+        self.main_page.taskbar.show_report(path)
+
+    def set_animation_speed(self, speed):
+        self.main_page.taskbar.set_animation_speed(str(speed))
 
     def on_start(self):
         """
@@ -121,6 +135,8 @@ class Visualizer(QObject):
                     self.main_page.taskbar.set_avatar(event.msg)
                 elif event.action_name == "sbrain":
                     self.main_page.taskbar.set_brain(event.msg)
+                elif event.action_name == "lbrain":
+                    self.main_page.taskbar.list_brain(event.msg)
 
         elif isinstance(event, VisualizerEvent):
             if event.msg == "animation":
