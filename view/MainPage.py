@@ -99,7 +99,7 @@ class MainPage(QMainWindow):
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
         if os.path.exists(pic_path):
             self.main_map.update_mainmap(pic_path)
-            self.display_properties(self.property_name + self.property[self.pic_counter])
+            self.display_properties(self.property_name + self.property[self.pic_counter]) if self.pic_counter < len(self.property) else None
             self.pic_counter += 1
         else:
             self.pic_counter = float('inf')

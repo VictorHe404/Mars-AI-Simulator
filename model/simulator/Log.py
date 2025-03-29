@@ -50,7 +50,7 @@ class Log:
                     cell = " " * 5
                 line += cell
             lines.append(line)
-        return "\n".join(lines)
+        return " ".join(lines)
 
     def print_log(self):
         print(self.__str__())
