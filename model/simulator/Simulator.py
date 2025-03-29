@@ -338,7 +338,7 @@ class Simulator:
             self.export_logs_to_csv()
             self.plot_results()
             self.plot_full_map()
-            self.save_log_to_file()
+            self.generate_simulation_report()
             return True, self.path_finding_result
         else:
             print("The target brain is not ready yet")
@@ -366,7 +366,7 @@ class Simulator:
         self.export_logs_to_csv()
         self.plot_results()
         self.plot_full_map()
-        self.save_log_to_file()
+        self.generate_simulation_report()
 
     # The overall function to plot the result
     def plot_results(self):
@@ -763,7 +763,7 @@ class Simulator:
                 file.write(f"Start Position: ({self.target_task.start_row}, {self.target_task.start_col})\n")
                 file.write(f"Destination: ({self.target_task.des_row}, {self.target_task.des_col})\n")
 
-                if self.target_map and len(self.target_map) > 0:
+                if self.target_map is not None and len(self.target_map) > 0:
                     if (0 <= self.target_task.start_row < len(self.target_map) and
                             0 <= self.target_task.start_col < len(self.target_map[0])):
                         start_elevation = self.target_map[self.target_task.start_row][self.target_task.start_col]
