@@ -13,6 +13,9 @@ Depth (深度) 是相对于 参考高度面 (例如火星表面某个平均高�
 1000x1000test.jpg-是该局部图在真实卫星影像上的实际图片
 
 LouthCraterRealimage.jpg -Louth Crater ice mound（劳斯陨石坑冰丘)的真实卫星影像图片
+
+MarkLouthCraterRealimage.jpg 是一个标注文件，用一个红色正方形框来标注，我们在全地形（
+LouthCraterRealimage.jpg）中 待截取的部分
 ===============================================
 地图像素尺寸和实际尺寸信息
 全地形
@@ -56,6 +59,29 @@ optional：可使用visualize_mars_terrain函数以分层设色地形图hypsomet
 ，其中visualize_mars_terrain的第二个参数range（tuple）类型是通过find_min_max_in_polygon返回得到
 
 ===============================================
+contains new terrain data
+the subpart is extracted from Eolian source layers exposed in western Abalos Scopuli and DTEPC_053805_2610_053845_2610_A01.tif
+2 points a and b form the diagonal of the square , in this graph below
 
+a--------o       - x direction
+|        | 
+|        |
+|        |
+o--------b
+
+|
+y direction 
+
+#The minimum value of valid data within the polygon area (Exclude less than -6000 ): -5019.0673828125
+#The maximum value of valid data in the polygon area: -4668.70849609375
+
+coordinates value are below : 
+in jpg coordinate system located in DTEPC_053805_2610_053845_2610_A01.jpg
+point a : (x,y) = 259.1, 593.9
+point b : (x,y) = 359.1, 693.9
+
+in tif coordinate system located in DTEPC_053805_2610_053845_2610_A01.tif (此tif文件太大，没上传github)
+point a : (x,y) = 2591.00, 5940.00
+point b : (x,y) = 3592.00, 6940.00
 
 

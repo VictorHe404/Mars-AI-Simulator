@@ -142,7 +142,7 @@ class WelcomePage(QMainWindow):
         QMessageBox.information(
             self,
             "About Us",
-            "Authors: Mars AI Team\nContact: marsai@example.com"
+            "Authors: SteakHolder Team\nContact: yanze.lyu@mail.mcgill.ca"
         )
 
     def start_application(self):

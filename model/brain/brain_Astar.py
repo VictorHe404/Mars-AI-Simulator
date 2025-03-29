@@ -150,7 +150,8 @@ class BrainAStar(Brain):
 
                     new_g_score = g_score + self.cost(x, y, nx, ny)
                     h_score = abs(nx - end[0]) + abs(ny - end[1])
-                    new_f_score = new_g_score + h_score
+                #    new_f_score = new_g_score + h_score
+                    new_f_score = h_score
 
                     #push avalable to the que
                     heapq.heappush(open_set,
@@ -172,20 +173,17 @@ class BrainAStar(Brain):
         print("The destination is unreachable, task failed")
         return self.task_trail, False
 
-    '''
-    def reset(self):
-        self.task_trail.clear()
-        self.time = 0
-        self.detect_map = [[114514 for _ in range(len(self.original_map[0]))] for _ in range(len(self.original_map))]
-        return True
-    '''
 
     def movable(self, avatar_x, avatar_y, target_x, target_y):
-        threshold = self.current_avatar.get_max_slope()
-        if abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y]) >= threshold:
-            return False
-        else:
-            return True
+        return self.current_avatar.get_movable(self.detect_map[avatar_x][avatar_y], self.detect_map[target_x][target_y])
 
     def cost(self, avatar_x, avatar_y, target_x, target_y):
-        return abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y])
+        base_time = self.current_avatar.calculate_time_per_grid()
+        elevation_difference = abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y])
+        distance = 10
+        slope_factor = 1.0
+
+        # Calculate the actual time required based on elevation difference
+        actual_time = base_time * (1 + slope_factor * (elevation_difference / distance))
+
+        return math.ceil(actual_time)
