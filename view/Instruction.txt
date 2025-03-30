@@ -21,22 +21,52 @@ Available Commands:
 
 lmap
 Description: Lists all available maps for the user to explore.
+Usage Example:
+lmap
+[lmap] List of available maps:
+  - Louth_Crater_Normal
+  - Louth_Crater_Sharp
+
 
 cavatar [avatarname]
 Description: Creates a new avatar with the specified [avatarname].
+Usage Example:
+cavatar a1
+[cavatar] Avatar 'a1' created successfully.
+
 
 lavatar
 Description: Lists all existing avatars for the user.
+Usage Example:
+lavatar
+[lavatar] List of existing avatars:
+  - a1
+  - a10
+
 
 savatar [avatarname]
 Description: Sets the avatar named [avatarname] as the current avatar.
+Usage Example:
+savatar a1
+[savatar] Avatar 'a1' set successfully.
+
 
 lbrain
 Description: Lists all available brains for the currently selected avatar.
+Usage Example:
+lbrain
+[lbrain] List of available brains:
+  - greedy
+  - astar
+
 
 sbrain [braintype]
 Description: Sets the brain of the current avatar to [braintype].
 Note: [braintype] must be one of the following (fixed choices): astar, greedy
+Usage Example:
+sbrain astar
+[sbrain] Brain set successfully to astar.
+
 
 stask [start_row] [start_column] [destination_row] [destination_column]
 Description: Sets a task for the current avatar to move from (start_row, start_column) to (destination_row, destination_column).
@@ -51,10 +81,13 @@ move -t 20 20 35 45
 Moves the avatar from (20, 20) to (35, 45).
 
 report [-flag(s)]
-Description: Generates a report about the current avatar and its status. Takes no arguments, but accepts optional flags.
-Available Flags:
--l: Include detailed information in the report.
--a: Generate a comprehensive report, including the avatar’s status.
+Description: Generates a report about the current avatar and its status. Takes no arguments.
+
+iavatar [avatarname]
+Description: find a specific avatar by name and display its information. If the avatar is not found, an error message is displayed. If the [avatarname] is not specified, the currently selected avatar is used.
 Usage Example:
-report -l -a
+iavatar
+[iavatar] Info for currently selected avatar:[info]
+iavatar a1
+[iavatar] Info for avatar a1: [info]
 

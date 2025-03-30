@@ -71,12 +71,13 @@ class Visualizer(QObject):
         self.event_manager.post_event(SimulatorEvent({"command": "smap", "map_name": map_name}, task_bar=True))
 
     def show_report(self):
-        #example using instruction.txt
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(base_path, 'Instruction.txt')
-        self.main_page.taskbar.show_report(path)
+        cache_path = os.path.join(os.getcwd(), 'cache_directory')
+        report_filename = "simulation_report.txt"
+        report_path = os.path.join(cache_path, report_filename)
+        self.main_page.taskbar.show_report(report_path)
 
     def set_animation_speed(self, speed):
+        self.main_page.set_timer_speed(speed)
         self.main_page.taskbar.set_animation_speed(str(speed))
 
     def on_start(self):

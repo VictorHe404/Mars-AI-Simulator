@@ -78,7 +78,7 @@ class MainPage(QMainWindow):
         # Timer to update image every 100ms (10 FPS)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_image)
-        self.timer.start(100)
+        self.timer.start(100) # default animation speed is 10 FPS
         self.pic_counter = float('inf')
         self.update_image()
         self.property = None
@@ -126,7 +126,9 @@ class MainPage(QMainWindow):
         """Display text in the property widget below the mini map."""
         self.property_widget.setPlainText(text)
 
-
+    def set_timer_speed(self, speed: float):
+        """Set the timer speed."""
+        self.timer.setInterval(int(100 /speed ))  #set FPS to 10 * speed
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainPage()
