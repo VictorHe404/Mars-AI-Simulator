@@ -202,7 +202,7 @@ class TaskbarWidget(QWidget):
 
     def show_report(self, path):
         try:
-            with open(path, 'r', encoding='utf-8') as file:
+            with open(path, 'r', encoding='iso-8859-1') as file:
                 content = file.read()
         except Exception as e:
             content = f"Could not load the report:\n{e}"

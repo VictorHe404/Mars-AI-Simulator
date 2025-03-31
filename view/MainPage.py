@@ -114,20 +114,10 @@ class MainPage(QMainWindow):
     def update_mainmap(self, main_map_image_path):
         self.main_map.update_mainmap(main_map_image_path)
 
-    '''
-    def start_visualizer(self):
-        cache_path = os.path.join(os.getcwd(), 'cache_directory')
-        log_path = os.path.join(cache_path, f'log_export.csv')
-        print(log_path)
-        file = open(log_path, 'r')
-        self.property_name = file.readline()
-        self.property = [line for line in file.readlines()]
-        self.pic_counter = 0
-    '''
     def start_visualizer(self):
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         log_path = os.path.join(cache_path, 'log_export.csv')
-        print(log_path)
+        #print(log_path)
 
         with open(log_path, 'r') as file:
             reader = csv.DictReader(file)
@@ -143,7 +133,7 @@ class MainPage(QMainWindow):
 
                 nearby_values = re.findall(r'-\d+|x', nearby_raw)
 
-                print(f"Split nearby_values ({len(nearby_values)}): {nearby_values}")
+                #print(f"Split nearby_values ({len(nearby_values)}): {nearby_values}")
 
                 if len(nearby_values) == 9:
                     grid = "\n".join(
@@ -151,7 +141,7 @@ class MainPage(QMainWindow):
                         for i in range(0, 9, 3)
                     )
                 else:
-                    print("Still not 9 values! Raw:", nearby_raw)
+                    #print("Still not 9 values! Raw:", nearby_raw)
                     grid = nearby_raw
 
                 formatted = (

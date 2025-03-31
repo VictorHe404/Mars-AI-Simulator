@@ -20,6 +20,7 @@ from model.simulator.task import Task
 from model.avatar import Avatar, DetectionMask,  Sensor
 import model.brain as Brain
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import re
 
 
 
@@ -843,7 +844,21 @@ class Simulator:
                     for idx in sample_indices:
                         log = self.result_trail[idx]
                         file.write(f"Step {idx} - Position ({log.get_index_x()}, {log.get_index_y()}):\n")
+                        '''
                         file.write(log.get_local_grid_str(size=5))
+                        file.write("\n\n")
+                        '''
+
+                        raw_grid_str = log.get_local_grid_str(size=5)
+
+                        tokens = re.findall(r'-?\d+|x|\?', raw_grid_str)
+                        size = 5
+                        lines = []
+                        for i in range(0, len(tokens), size):
+                            row = tokens[i:i + size]
+                            formatted_row = " ".join(f"{val:^6}" for val in row)
+                            lines.append(formatted_row)
+                        file.write("\n".join(lines))
                         file.write("\n\n")
             else:
                 file.write("No simulation results available.\n")
