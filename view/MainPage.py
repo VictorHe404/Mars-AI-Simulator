@@ -1,3 +1,4 @@
+import csv
 import sys
 import webbrowser
 from PyQt6.QtWidgets import (
@@ -12,6 +13,7 @@ import os
 from view.CommandPromptWidget import CommandPromptWidget
 from view.MapModel import MapModel, MiniMapView, MainMapView
 from view.TaskBarWidget import TaskbarWidget
+import re
 
 
 class MainPage(QMainWindow):
@@ -112,6 +114,7 @@ class MainPage(QMainWindow):
     def update_mainmap(self, main_map_image_path):
         self.main_map.update_mainmap(main_map_image_path)
 
+    '''
     def start_visualizer(self):
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         log_path = os.path.join(cache_path, f'log_export.csv')
@@ -120,6 +123,52 @@ class MainPage(QMainWindow):
         self.property_name = file.readline()
         self.property = [line for line in file.readlines()]
         self.pic_counter = 0
+    '''
+    def start_visualizer(self):
+        cache_path = os.path.join(os.getcwd(), 'cache_directory')
+        log_path = os.path.join(cache_path, 'log_export.csv')
+        print(log_path)
+
+        with open(log_path, 'r') as file:
+            reader = csv.DictReader(file)
+            self.property = []
+            for row in reader:
+                x = row['x']
+                y = row['y']
+                time = row['time']
+                energy = row['energy']
+                elevation = row['elevation']
+                friction = row['friction']
+                nearby_raw = row['local_grid']
+
+                nearby_values = re.findall(r'-\d+|x', nearby_raw)
+
+                print(f"Split nearby_values ({len(nearby_values)}): {nearby_values}")
+
+                if len(nearby_values) == 9:
+                    grid = "\n".join(
+                        "  ".join(f"{val:>6}" for val in nearby_values[i:i + 3])
+                        for i in range(0, 9, 3)
+                    )
+                else:
+                    print("Still not 9 values! Raw:", nearby_raw)
+                    grid = nearby_raw
+
+                formatted = (
+                    f"Simulation Snapshot\n"
+                    f"x_index: {x}\n"
+                    f"y_index: {y}\n"
+                    f"time: {time} s\n"
+                    f"energy_left: {energy}\n"
+                    f"current_elevation: {elevation}\n"
+                    f"current_friction: {friction}\n"
+                    f"nearby:\n{grid}"
+                )
+
+                self.property.append(formatted)
+
+        self.pic_counter = 0
+        self.property_name = ""
 
 
     def display_properties(self, text: str):
