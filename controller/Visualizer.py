@@ -144,7 +144,9 @@ class Visualizer(QObject):
                 self.start_visualizer_signal.emit()  # via signal to prevent the timer started from other thread
             elif event.msg == "minimap":
                 if event.map_path in ["Louth_Crater_Normal", "Louth_Crater_Sharp"]:
-                    self.update_minimap_signal.emit("Louth_Crater_minimap.png")
+                    self.update_minimap_signal.emit("LCMinimap.jpg")
+                elif event.map_path in ["Eolian_Normal"]:
+                    self.update_minimap_signal.emit("EMinimap.jpg")
             elif event.msg in ["main_map", "task"]:
                 self.update_mainmap_signal.emit(event.map_path)
 
