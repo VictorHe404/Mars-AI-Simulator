@@ -168,6 +168,30 @@ class MainPage(QMainWindow):
     def set_timer_speed(self, speed: float):
         """Set the timer speed."""
         self.timer.setInterval(int(100 /speed ))  #set FPS to 10 * speed
+
+    def show_report(self, path):
+        try:
+            with open(path, 'r', encoding='iso-8859-1') as file:
+                content = file.read()
+        except Exception as e:
+            content = f"Could not load the report:\n{e}"
+
+        # Create a new window
+        window = QWidget()
+        window.setWindowTitle("Report")
+        window.resize(600, 400)
+
+        layout = QVBoxLayout()
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setPlainText(content)
+
+        layout.addWidget(text_edit)
+
+        window.setLayout(layout)
+        window.show()
+        self.report_window = window
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainPage()
