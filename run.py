@@ -4,27 +4,38 @@ import subprocess
 import sys
 from pathlib import Path
 
-# 1. Define the virtual environment directory and main file
+# Paths
 venv_dir = Path("venv")
-requirements_file = Path("requirements.txt")
-main_file = "main.py"  # Change this if your project's entry point is different
+requirements = Path("requirements.txt")
+reset_db = Path("reset_db.py")
+main_script = Path("main.py")
 
-# 2. Create a virtual environment if it doesn't exist
+# 1. Create virtual environment if it doesn't exist
 if not venv_dir.exists():
     print("Creating virtual environment...")
     subprocess.check_call([sys.executable, "-m", "venv", str(venv_dir)])
 
-# 3. Determine the path to the virtual environment's Python executable
-system = platform.system()
-if system == "Windows":
-    python_exec = venv_dir / "Scripts" / "python"
+# 2. Get the path to the Python executable inside the venv
+if platform.system() == "Windows":
+    python_exec = venv_dir / "Scripts" / "python.exe"
 else:
     python_exec = venv_dir / "bin" / "python"
 
-# 4. Install dependencies from requirements.txt
-print("Installing dependencies...")
-subprocess.check_call([str(python_exec), "-m", "pip", "install", "-r", str(requirements_file)])
+# 3. Install dependencies if requirements.txt exists
+if requirements.exists():
+    print("Installing dependencies from requirements.txt...")
+    subprocess.check_call([str(python_exec), "-m", "pip", "install", "--upgrade", "pip"])
+    subprocess.check_call([str(python_exec), "-m", "pip", "install", "-r", str(requirements)])
+else:
+    print("requirements.txt not found, skipping installation.")
 
-# 5. Run the main Python application
-print(f"Starting project with {main_file}...")
-subprocess.check_call([str(python_exec), main_file])
+# 4. Run database setup
+if reset_db.exists():
+    print("Setting up database via reset_db.py...")
+    subprocess.check_call([str(python_exec), str(reset_db)])
+else:
+    print("reset_db.py not found, skipping DB reset.")
+
+# 5. Run main.py
+print(f"Running {main_script}...")
+subprocess.check_call([str(python_exec), str(main_script)])
