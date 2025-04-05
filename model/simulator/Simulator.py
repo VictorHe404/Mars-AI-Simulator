@@ -56,7 +56,7 @@ class Simulator:
         """
         self.target_map=[]
         self.target_avatar=None
-        self.brain_list=["greedy","astar", "dfs"]
+        self.brain_list=["greedy","astar", "dfs", "rl"]
         self.avatar_manager=None
         self.target_brain=None
         self.target_environment=Environment()
@@ -306,6 +306,8 @@ class Simulator:
                 self.target_brain = Brain.BrainAStar()
             case "dfs":
                 self.target_brain = Brain.BrainDFS()
+            case "rl":
+                self.target_brain = Brain.BrainRL()
             case _:
                 return False
 
