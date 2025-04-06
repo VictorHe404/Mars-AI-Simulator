@@ -71,6 +71,147 @@ Python 3.11 (recommended) or 3.12
 
 ## 3. Instruction
 
+Command Line Interface for the Visualizer
+
+The CLI for the visualizer follows a Linux-style structure:
+Command Format: 
+```bash
+command [-flag(s)] [argument(s)]
+```
+
+If an undefined command is entered, the system returns: 
+```bash
+Error: Invalid command
+```
+
+If a command is used with invalid or missing arguments, a specific error message is returned.
+
+Example Errors: 
+```bash
+move
+moveCommandError: Destination not specified.
+
+move [invalid destination]
+moveCommandError: Invalid destination format: [invalid destination]
+```
+
+Flags: Flags allow users to modify or extend command functionality. Flags begin with a hyphen (-) and are placed before arguments.
+
+Available Commands:
+```bash
+lmap
+```
+Description: Lists all available maps for the user to explore.
+
+Usage Example:
+```bash
+lmap
+[lmap] List of available maps:
+  - Louth_Crater_Normal
+  - Louth_Crater_Sharp
+```
+```bash
+cavatar [avatarname]
+```
+
+Description: Creates a new avatar with the specified [avatarname].
+
+Usage Example:
+```bash
+cavatar a1
+[cavatar] Avatar 'a1' created successfully.
+```
+
+```bash
+lavatar
+```
+Description: Lists all existing avatars for the user.
+
+Usage Example:
+```bash
+lavatar
+[lavatar] List of existing avatars:
+  - a1
+  - a10
+```
+
+```bash
+savatar [avatarname]
+```
+Description: Sets the avatar named [avatarname] as the current avatar.
+
+Usage Example:
+```bash
+savatar a1
+[savatar] Avatar 'a1' set successfully.
+```
+
+```bash
+lbrain
+```
+Description: Lists all available brains for the currently selected avatar.
+
+Usage Example:
+
+```bash
+lbrain
+[lbrain] List of available brains:
+  - greedy
+  - astar
+```
+
+```bash
+sbrain [braintype]
+```
+
+Description: Sets the brain of the current avatar to [braintype].
+
+Note: [braintype] must be one of the following (fixed choices): astar, greedy
+
+Usage Example:
+```bash
+sbrain astar
+[sbrain] Brain set successfully to astar.
+```
+```bash
+stask [start_row] [start_column] [destination_row] [destination_column]
+```
+Description: Sets a task for the current avatar to move from (start_row, start_column) to (destination_row, destination_column).
+
+```bash
+run
+```
+Description: Executes the pre-set task assigned to the current avatar.
+
+```bash
+move -t [start_row] [start_column] [destination_row] [destination_column]
+```
+Description: Moves the current avatar from a starting position to a specified destination.
+
+Usage Example:
+```bash
+move -t 20 20 35 45
+Moves the avatar from (20, 20) to (35, 45).
+```
+
+```bash
+report [-flag(s)]
+```
+Description: Generates a report about the current avatar and its status. Takes no arguments.
+
+```bash
+iavatar [avatarname]
+```
+Description: find a specific avatar by name and display its information. If the avatar is not found, an error message is displayed. If the [avatarname] is not specified, the currently selected avatar is used.
+
+Usage Example:
+```bash
+iavatar
+[iavatar] Info for currently selected avatar:[info]
+iavatar a1
+[iavatar] Info for avatar a1: [info]
+```
+
 ## 4. Citation
 
 ## 5. Contact
