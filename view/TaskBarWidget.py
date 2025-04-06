@@ -146,7 +146,8 @@ class TaskbarWidget(QWidget):
             "Create Avatar",
             "Enter Avatar name:"
         )
-        self.create_avatar_signal.emit(avatar_name)
+        if ok_pressed:
+            self.create_avatar_signal.emit(avatar_name)
 
     def create_avatar(self, avatar_name):
         QMessageBox.information(self, "Create Avatar", avatar_name)
@@ -157,7 +158,8 @@ class TaskbarWidget(QWidget):
             "Set Avatar Name",
             "Enter Avatar name:"
         )
-        self.set_avatar_signal.emit(avatar_name)
+        if ok_pressed:
+            self.set_avatar_signal.emit(avatar_name)
 
     def set_avatar(self, avatar_name):
         QMessageBox.information(self, "Set Avatar", avatar_name)
@@ -174,7 +176,8 @@ class TaskbarWidget(QWidget):
             "Set Brain Name",
             "Enter Brain name:"
         )
-        self.set_brain_signal.emit(brain_name)
+        if ok_pressed:
+            self.set_brain_signal.emit(brain_name)
 
     def set_brain(self, brain_name):
         QMessageBox.information(self,"Set Brain", brain_name)
@@ -192,7 +195,8 @@ class TaskbarWidget(QWidget):
             "Set Map Name",
             "Enter map name:"
         )
-        self.set_map_signal.emit(map_name)
+        if ok_pressed:
+            self.set_map_signal.emit(map_name)
 
     def set_map(self, map_name):
         QMessageBox.information(self, "Set Map", map_name)
@@ -228,10 +232,18 @@ class TaskbarWidget(QWidget):
         animation_speed, ok_pressed = QInputDialog.getText(
             self,
             "Set Animation Speed",
-            "Enter speed:"
+            "Enter speed (Float):"
         )
-        animation_speed = float(animation_speed)
-        self.set_animation_speed_signal.emit(animation_speed)
+        if ok_pressed:
+            try:
+                animation_speed = float(animation_speed)
+                self.set_animation_speed_signal.emit(animation_speed)
+            except ValueError:
+                QMessageBox.warning(
+                    self,
+                    "Invalid Input",
+                    "Please enter a valid floating-point number for the speed."
+                )
 
     def set_animation_speed(self, animation_speed):
         QMessageBox.information(self, "Set Animation Speed", animation_speed)
