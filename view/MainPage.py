@@ -167,7 +167,7 @@ class MainPage(QMainWindow):
 
     def set_timer_speed(self, speed: float):
         """Set the timer speed."""
-        self.timer.setInterval(int(100 /speed ))  #set FPS to 10 * speed
+        self.timer.setInterval(int(100 /speed))  #set FPS to 10 * speed
 
     def show_report(self, path):
         try:
