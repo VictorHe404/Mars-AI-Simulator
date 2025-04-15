@@ -97,6 +97,16 @@ class SimulatorManager:
                     else:
                         status, msg = False, "[iavatar] No avatar is currently selected."
 
+            elif command["command"] == "smaxframe":
+                print("SimulatorManager received smaxframe command")
+                frame_count = int(command["frame_count"])
+                if self.simulator.set_max_image_number(frame_count):
+                    status = True
+                    msg = f"[smaxframe] Maximum number of frames set to {frame_count}."
+                else:
+                    status = False
+                    msg = f"[smaxframe] Failed to set frame count: {frame_count} is out of the valid range [100–400]."
+
             if not event.task_bar:
                 self.event_manager.post_event(
                     ActionStatusEvent(status, msg, command["command"]))
@@ -186,10 +196,10 @@ class SimulatorManager:
         is_running, running_result, estimated_time, virtual_time = self.simulator.run_simulation()
 
         if not is_running:
-            error_message = "[run] Simulator failed to start due to unset elements (missing map, avatar, or task)."
+            error_message = "[run] Simulator failed to start due to unset elements (missing brain, map, avatar, or task)."
             return False , error_message
         pre_animation_msg = f"[run] The task took {virtual_time} seconds of simulate time to finish.\n"
-        pre_animation_msg += f"[run] Task {'completed' if running_result else 'failed'}, starting processing animation...\n"
+        pre_animation_msg += f"[run] Task {'completed' if running_result else 'failed'}, starting processing animation... (Animation will depends on the max frame limitation)\n"
         pre_animation_msg += f"[run] Estimated duration: ~{estimated_time} seconds."
         self.event_manager.post_event(ActionStatusEvent(is_running,pre_animation_msg, "run_simulator"))
         self.simulator.process_simulation_output()

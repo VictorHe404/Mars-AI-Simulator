@@ -18,6 +18,19 @@ Flags: Flags allow users to modify or extend command functionality. Flags begin 
 ========================
 Available Commands:
 ========================
+  lmap             - List available maps
+  cavatar [name]   - Create a new avatar
+  lavatar          - List all avatars
+  savatar [name]   - Set current avatar
+  lbrain           - List available brains
+  sbrain [type]    - Set brain for avatar
+  stask [sX sY dX dY] - Set a task with start and destination
+  run              - Execute current task
+  iavatar [name]   - Show avatar info (or current if omitted)
+  sdb [true|false] - Enable/disable database mode
+  smaxframe [num]  - Set max number of frames (100–400)
+
+
 
 lmap
 Description: Lists all available maps for the user to explore.
@@ -90,4 +103,12 @@ iavatar
 [iavatar] Info for currently selected avatar:[info]
 iavatar a1
 [iavatar] Info for avatar a1: [info]
+
+smaxframe [frame_count]
+Description: Sets the maximum number of animation frames to be generated during simulation output. A smaller frame number limitation will greatly increase the animation speed.
+Range: 100 to 400.
+Usage Example:
+smaxframe 200
+[smaxframe] Maximum number of frames set to 200.
+
 

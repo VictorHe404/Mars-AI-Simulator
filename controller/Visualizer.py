@@ -79,7 +79,7 @@ class Visualizer(QObject):
     def set_animation_speed(self, speed):
         if not (speed< 0.5 or speed > 3.0):
             self.main_page.set_timer_speed(speed)
-            self.main_page.taskbar.set_animation_speed("The speed is set to " str(speed))
+            self.main_page.taskbar.set_animation_speed("The speed is set to " + str(speed))
         else:
             self.main_page.set_timer_speed(1.0)
             self.main_page.taskbar.set_animation_speed("The speed is out of range, set to 1.0")

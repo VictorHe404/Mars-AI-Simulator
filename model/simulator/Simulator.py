@@ -56,7 +56,7 @@ class Simulator:
         """
         self.target_map=[]
         self.target_avatar=None
-        self.brain_list=["greedy","astar", "dfs", "rl"]
+        self.brain_list=["greedy","astar", "dfs"]
         self.avatar_manager=None
         self.target_brain=None
         self.target_environment=Environment()
@@ -74,6 +74,7 @@ class Simulator:
         self.log_counter = 1
         self.database_available = database_available
         self.avatars = []
+        self.max_image = 200
 
     def set_avatar(self, name):
         """
@@ -222,6 +223,15 @@ class Simulator:
             return True
 
 
+    def set_max_image_number(self, number:int):
+        if number >= 100 and number <= 400:
+            self.max_image = number
+            print("The max image number is set to number.")
+            return True
+        else:
+            print("The max image number is out of range [100,400]")
+            return False
+
     def set_map(self, name:str):
         """
         set the target_map to the user wanted
@@ -268,22 +278,34 @@ class Simulator:
         self.target_task=Task(s_row,s_col,d_row,d_col)
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
-        print("Debug Print")
+        #print("Debug Print")
+
 
         if len(self.target_map) != 0:
-            print("Debug Prin2")
+            #print("Debug Prin2")
             save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
             if os.path.exists(save_path):
                 try:
-                    print("Debug Prin3")
+                    #print("Debug Prin3")
                     os.remove(save_path)
                     print(f"Deleted existing map file: {save_path}")
-                    print("Debug Print4")
+                    #print("Debug Print4")
                 except Exception as e:
-                    print("Debug Print5")
+                    #print("Debug Print5")
                     print(f"Error deleting file {save_path}: {e}")
-            print("Debug Print6")
+            #print("Debug Print6")
             self.plot_full_map_set_map(save_path, self.target_task)
+        else:
+            save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
+            if os.path.exists(save_path):
+                try:
+                    #print("Debug Prin3")
+                    os.remove(save_path)
+                    print(f"Deleted existing map file: {save_path}")
+                    #print("Debug Print4")
+                except Exception as e:
+                    #print("Debug Print5")
+                    print(f"Error deleting file {save_path}: {e}")
 
         return True
 
@@ -350,13 +372,22 @@ class Simulator:
             return False, False
 
     def run_simulation(self):
+        if self.target_brain is None:
+            print("The target brain is not ready yet")
+            return False, False, 0, 0
+
         if self.target_brain.is_ready_to_run():
             self.path_finding_result = False
             self.clear_directory()
             self.target_brain.reset()
             self.path_finding_counter = 0
             self.result_trail, self.path_finding_result = self.target_brain.run()
-            estimated_time = int(0.25 * len(self.result_trail))
+
+            total_logs = len(self.result_trail)
+            step = max(1, total_logs // self.max_image + 1)
+            actual_image_count = total_logs // step
+
+            estimated_time = int(0.25 * actual_image_count)  # 0.25s per image
             virtual_time = self.result_trail[-1].get_time()
             return True, self.path_finding_result, estimated_time, virtual_time
         else:
@@ -375,23 +406,37 @@ class Simulator:
 
     # The overall function to plot the result
     def plot_results(self):
-        recent_positions = deque(maxlen=4)
+        total_logs = len(self.result_trail)
+        if total_logs == 0:
+            print("No result trail found.")
+            return
 
-        for i, log in enumerate(self.result_trail):
-            recent_positions.append((log.get_index_x(), log.get_index_y()))
+        step = max(1, total_logs // self.max_image + 1)
+        trail_length = 3 + step
+        img_index = 0
 
-            save_path = os.path.join(self.result_directory_path, f'elevation_map_{i}.png')
+        for i in range(0, total_logs, step):
+            if self.path_finding_counter >= self.max_image:
+                print("Maximum image count reached. Skipping further image generation.")
+                break
+
+            start_index = max(0, i - trail_length + 1)
+            recent_positions = [
+                (log.get_index_x(), log.get_index_y()) for log in self.result_trail[start_index:i + 1]
+            ]
+
+            log = self.result_trail[i]
+            save_path = os.path.join(self.result_directory_path, f'elevation_map_{img_index}.png')
             print(f"Saving elevation map to {save_path}")
 
             self.plot_elevation_map(
                 elevation_data=log.get_detect_map(),
-                #min_val=self.map_minValue,
-                #max_val=self.map_maxValue,
                 undetected_val=114514,
                 avatar_positions=recent_positions,
                 save_path=save_path
             )
             self.path_finding_counter += 1
+            img_index += 1
 
     def plot_elevation_map(self, elevation_data, undetected_val, avatar_positions=None,
                            save_path=None, show_colorbar=False):
@@ -534,7 +579,10 @@ class Simulator:
         detected_map[last_detected_map != 114514] = self.target_map[last_detected_map != 114514]
         avatar_path = [(log.get_index_x(), log.get_index_y()) for log in self.result_trail]
 
-        max_radius = max(self.target_map.shape)
+        height, width = self.target_map.shape
+        corner_coords = [(0, 0), (0, width - 1), (height - 1, 0), (height - 1, width - 1)]
+        max_radius = max(np.hypot(final_pos[0] - x, final_pos[1] - y) for x, y in corner_coords)
+
         file_counter = self.path_finding_counter
 
         for step in range(expansion_steps + 1):

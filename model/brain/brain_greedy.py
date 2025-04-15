@@ -37,7 +37,7 @@ class BrainGreedy(Brain):
 
             # Apply the detection mask
             self.detect_map = detection_mask.apply_mask(self.detect_map, self.original_map, x, y)
-            print("The current position is ({0}, {1}), the value is {2}".format(x, y, self.detect_map[x][y]))
+            #print("The current position is ({0}, {1}), the value is {2}".format(x, y, self.detect_map[x][y]))
 
             # Add the current position to the visit set
             visited.add((x, y))
@@ -54,7 +54,7 @@ class BrainGreedy(Brain):
 
             # If the next move is the same as the current position, no place to go, task failed
             if next_x == x and next_y == y:
-                print("The destination is unreachable, task failed")
+                #print("The destination is unreachable, task failed")
                 break
 
 
@@ -84,8 +84,8 @@ class BrainGreedy(Brain):
 
         # Check whether the mission succeed
         if x == end_x and y == end_y:
-            print("The current position is ({0}, {1}), the value is {2}".format(x, y, self.detect_map[x][y]))
-            print("The destination is reachable, task succeeded")
+            #print("The current position is ({0}, {1}), the value is {2}".format(x, y, self.detect_map[x][y]))
+            #print("The destination is reachable, task succeeded")
             log_entry = Log(index_x=x, index_y=y, detect_map=[row[:] for row in self.detect_map], time=self.time, energy=energy)
             self.task_trail.append(log_entry)
             return self.task_trail, True

@@ -61,7 +61,8 @@ class CommandController:
         iavatar_parser = subparsers.add_parser("iavatar", help="Show the information of the avatar")
         iavatar_parser.add_argument("avatar_name", nargs="?", default=None, help="Name of the avatar (optional)")
 
-
+        smaxframe_parser = subparsers.add_parser("smaxframe", help="Set the maximum number of frames to generate")
+        smaxframe_parser.add_argument("frame_count", type=int, help="Maximum number of frames (images) to generate")
 
     def notify(self, event: Event) -> None:
         """
