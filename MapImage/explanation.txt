@@ -1,62 +1,60 @@
-the image file of map
-这个文件夹里面储存的是火星地形-Louth Crater ice mound（劳斯陨石坑冰丘）的地图数据
-以下是各个文件的说明
-LouthCraterFullColorGraph.png-陨石坑全图的分层设色地形图
-Depth (深度) 是相对于 参考高度面 (例如火星表面某个平均高度) 的深度值。
-在这种情况下，较高的值 (负数接近零) 表示地形较高，而 较低的值 (更大的负数) 表示地形较低或更深。
-例如，-4560 可能表示一个山脊，而 -4700 可能表示一个深坑
+This folder contains map data of the Martian terrain - Louth Crater ice mound
+The following is a description of each file
+LouthCraterFullColorGraph.png - Layered color topographic map of the full crater
+Depth is the depth value relative to a reference height surface (such as an average height on the surface of Mars).
+In this case, higher values ​​(negative numbers closer to zero) indicate higher terrain, while lower values ​​(more negative numbers) indicate lower or deeper terrain.
+For example, -4560 may indicate a ridge, while -4700 may indicate a crater
 
-1000x1000subgraph.png-是截出来的1000*1000的陨石坑局部图的分层设色地形图
+1000x1000subgraph.png - is a layered color topographic map of a 1000*1000 cut-out crater partial map
 
-1000x1000Louth_Crater_ice_mound_subPart.tif-截出来的1000*1000的陨石坑局部图另存为的tif文件
+1000x1000Louth_Crater_ice_mound_subPart.tif - is a tif file saved as a cut-out 1000*1000 crater partial map
 
-1000x1000test.jpg-是该局部图在真实卫星影像上的实际图片
+1000x1000test.jpg - is the actual image of the partial map on a real satellite image
 
-LouthCraterRealimage.jpg -Louth Crater ice mound（劳斯陨石坑冰丘)的真实卫星影像图片
+LouthCraterRealimage.jpg - a real satellite image of the Louth Crater ice mound
 
-MarkLouthCraterRealimage.jpg 是一个标注文件，用一个红色正方形框来标注，我们在全地形（
-LouthCraterRealimage.jpg）中 待截取的部分
+MarkLouthCraterRealimage.jpg is a marked file, marked with a red square box, the part to be cut out in the full terrain (
+LouthCraterRealimage.jpg
 ===============================================
-地图像素尺寸和实际尺寸信息
-全地形
-像素宽度(Y 方向) 8,664
-像素长度(X 方向) 10,691                                                                                                                                                                    空间分辨率 (X 方向): 1.005921 米/像素
-空间分辨率 (Y 方向): 1.005921 米/像素
-实际宽度(Y 方向)：8.72 km
-实际长度(X 方向) ：10.75 km
+Map pixel size and actual size information
+Full terrain
+Pixel width (Y direction) 8,664
+Pixel length (X direction) 10,691 Spatial resolution (X direction): 1.005921 meters/pixel
+Spatial resolution (Y direction): 1.005921 meters/pixel
+Actual width (Y direction): 8.72 km
+Actual length (X direction): 10.75 km
 
-1000*1000局部地形
-像素宽度1000
-像素长度1000
-空间分辨率 (X 方向): 1.005921 米/像素
-空间分辨率 (Y 方向): 1.005921 米/像素
-实际宽度：1.005921 km
-实际长度：1.005921 km
+1000*1000 local terrain
+Pixel width 1000
+Pixel length 1000
+Spatial resolution (X direction): 1.005921 meters/pixel
+Spatial resolution (Y direction): 1.005921 meters/pixel
+Actual width: 1.005921 km
+Actual length: 1.005921 km
 ===============================================
-切割tif图像的流程
+Process of cutting tif images
 
-1.明确image的path
+1. Clear the path of the image
 
-2.明确tif文件的path
+2. Clear the path of the tif file
 
-2.使用下面这个函数，在matplotlib中呈现jpg文件，并在图中获取2个点在jpg图像里的坐标，这两个点组成了要截取的正方形的右对角线的两个端点
+2. Use the following function to present the jpg file in matplotlib and get the coordinates of two points in the jpg image in the figure. These two points form the two endpoints of the right diagonal of the square to be cut
 tifreader.display_image_with_matplotlib(image_path, title="x x x x")
-     坐标轴的原点在左上角
+The origin of the coordinate axis is in the upper left corner
 
-3.用map_jpg_to_tif_coordinates函数去将选择好的jpg坐标转换成tif坐标
+3. Use the map_jpg_to_tif_coordinates function to convert the selected jpg coordinates into tif coordinates
 coordinates = tifreader.map_jpg_to_tif_coordinates(image_path, file_path, x, y)
 
-4.用tifreader.calculate_square_Length(file_path, roi)函数去计计算2个点围成正方形的实际边长
+4. Use the tifreader.calculate_square_Length(file_path, roi) function to calculate the actual side length of the square surrounded by the two points
 
-5.用tifreader.crop_and_resize_tif(file_path, roi, outputsize)函数去正式截取正方形，若目标截取边长（outputsize）大于等于2个点围成正方形的实际边长
- ,直接返回由实际边长组成的正方形
+5. Use tifreader.crop_and_resize_tif(file_path, roi, outputsize) function to formally intercept the square. If the target intercepted side length (outputsize) is greater than or equal to the actual side length of the square surrounded by two points, directly return the square composed of the actual side length.
 
-6. 明确好输出文件path
+6. Specify the output file path
 
-7.用save_array_to_tif将截取好的正方形2维数组以tif文件的形式保存到输出文件中
+7. Use save_array_to_tif to save the intercepted square 2D array to the output file in the form of a tif file
 
-optional：可使用visualize_mars_terrain函数以分层设色地形图hypsometric map的形式可视化地图
-，其中visualize_mars_terrain的第二个参数range（tuple）类型是通过find_min_max_in_polygon返回得到
+optional: You can use the visualize_mars_terrain function to visualize the map in the form of a layered color topographic map hypsometric map
+, where the second parameter range (tuple) type of visualize_mars_terrain is returned by find_min_max_in_polygon
 
 ===============================================
 contains new terrain data 1
