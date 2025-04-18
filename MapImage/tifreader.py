@@ -98,7 +98,6 @@ def crop_and_resize_tif(tif_path: str, roi: tuple, output_size=(100, 100)):
         # Array slicing operation, cut the part of the array we need
         cropped_array = full_array[ymin:ymax, xmin:xmax]
 
-        #original area size
         original_height, original_width = cropped_array.shape
 
         # When the desired cropped map size (output_size) is greater than or equal to the original
@@ -227,22 +226,16 @@ def map_jpg_to_tif_coordinates(jpg_image_path: str, tif_file_path: str,
     - (tif_x, tif_y) (tuple): Coordinates in the TIFF file (matplotlib coordinate system).
     """
    
-    #Read JPG image size
     with Image.open(jpg_image_path) as img:
         jpg_width, jpg_height = img.size
 
-
-    # Read TIFF file size and affine transformation
     with rasterio.open(tif_file_path) as src:
         tif_width, tif_height = src.width, src.height
         transform = src.transform
 
-
-    #Calculate coordinate scale
     scale_x = tif_width / jpg_width
     scale_y = tif_height / jpg_height
 
-    #Calculate pixel coordinates in TIFF coordinate system
     tif_x = int(round(jpg_x * scale_x))
     tif_y = int(round(jpg_y * scale_y))
 
@@ -275,21 +268,17 @@ def visualize_full_tif(image_data: np.ndarray, nodata_value: float = -3.4028227e
     - nodata_value (float): fill value for invalid data (default: -3.4028227e+38).
     """
 
-    # Set invalid data as mask
-    # Create a mask for valid data
     valid_mask = image_data != nodata_value
 
 
-    #calculate the vaild data's boundary
     rows, cols = np.where(valid_mask)
     min_row, max_row = rows.min(), rows.max()
     min_col, max_col = cols.min(), cols.max()
 
-    #crop data under valid area
     cropped_array = image_data[min_row:max_row + 1, min_col:max_col + 1]
     masked_array = np.ma.masked_equal(cropped_array, nodata_value)
 
-    #visualez valid area
+    #visualez area
     plt.figure(figsize=(10, 8))
     plt.imshow(masked_array, cmap='terrain', vmin=-4932.626953125, vmax= -4548.0 )
     plt.colorbar(label='Elevation/Depth')
@@ -394,17 +383,13 @@ def calculate_square_Length(tif_path: str, roi: tuple):
 
     #print(f"TIFF size: length = {width}, length = {height}")
 
-   
-    #check if 2 points in the boundaty
+
     if not (0 <= Ax < width and 0 <= Bx < width and 0 <= Ay < height and 0 <= By < height):
         raise ValueError(f"coordinates access boundary: A({Ax}, {Ay}), B({Bx}, {By})")
 
    
-    #calculate the diagonal length
     diagonal_length = np.sqrt((Bx - Ax) ** 2 + (By - Ay) ** 2)
 
-
-    #calculate the length of square
     length = int(diagonal_length / np.sqrt(2))
 
     #print(f"length of square: {length:.2f} pixel")
