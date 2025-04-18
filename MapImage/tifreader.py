@@ -8,7 +8,7 @@ from matplotlib.path import Path
 
 
 
-def read_tif_to_array(file_path: str) -> np.ndarray:
+def read_tif_to_array(file_path: str):
     """
     Reads a TIFF file and returns a 2D float array
     """
@@ -61,7 +61,7 @@ def average_downsample(input_array, factor=10):
 
 
 
-def visualize_mars_terrain_without_range(image_data: np.ndarray, nodata_value: float = -3.4028227e+38) -> None:
+def visualize_mars_terrain_without_range(image_data: np.ndarray, nodata_value: float = -3.4028227e+38):
     masked_array = np.ma.masked_equal(image_data, nodata_value)
 
     valid_data = image_data[image_data != nodata_value]
@@ -80,7 +80,7 @@ def visualize_mars_terrain_without_range(image_data: np.ndarray, nodata_value: f
 
 
 
-def crop_and_resize_tif(tif_path: str, roi: tuple, output_size=(100, 100)) -> np.ndarray:
+def crop_and_resize_tif(tif_path: str, roi: tuple, output_size=(100, 100)):
     """
     Parameters:
     - tif_path (str): TIFF file path
@@ -120,7 +120,7 @@ def crop_and_resize_tif(tif_path: str, roi: tuple, output_size=(100, 100)) -> np
 
 
 def save_array_to_tif(array: np.ndarray, output_path: str,reference_tif_path: str = None,
-                      nodata_value: float = -3.4028227e+38) -> None:
+                      nodata_value: float = -3.4028227e+38):
     """
     Parameters:
     - array (np.ndarray): The 2D array (float32) to save.
@@ -170,7 +170,7 @@ def save_array_to_tif(array: np.ndarray, output_path: str,reference_tif_path: st
     print(f"successfully save as TIFF file in: {output_path}")
 
 
-def visualize_mars_terrain(image_data: np.ndarray, range: tuple,nodata_value: float = -3.4028227e+38) -> None:
+def visualize_mars_terrain(image_data: np.ndarray, range: tuple,nodata_value: float = -3.4028227e+38):
     """
     get visualization of 2D arrays of Mars terrain,
 
@@ -200,7 +200,7 @@ def visualize_mars_terrain(image_data: np.ndarray, range: tuple,nodata_value: fl
     plt.show()
 
 
-def display_image_with_matplotlib(image_path: str, title: str = "Image Display") -> None:
+def display_image_with_matplotlib(image_path: str, title: str = "Image Display"):
     """
     Parameters:
     - image_path (str): File path to the JPG image.
@@ -215,7 +215,7 @@ def display_image_with_matplotlib(image_path: str, title: str = "Image Display")
 
 
 def map_jpg_to_tif_coordinates(jpg_image_path: str, tif_file_path: str,
-                               jpg_x: float, jpg_y: float) -> tuple:
+                               jpg_x: float, jpg_y: float) :
     """
     Parameters:
     - jpg_image_path (str): JPG image file path.
@@ -251,7 +251,7 @@ def map_jpg_to_tif_coordinates(jpg_image_path: str, tif_file_path: str,
     return tif_x, tif_y
 
 
-def crop_jpg_image(image_path: str, output_path: str, top_left: tuple, bottom_right: tuple) -> None:
+def crop_jpg_image(image_path: str, output_path: str, top_left: tuple, bottom_right: tuple):
     """
     Parameters:
     - image_path (str): original JPG image file path.
@@ -268,7 +268,7 @@ def crop_jpg_image(image_path: str, output_path: str, top_left: tuple, bottom_ri
     print(f"saved crop jpg file as: {output_path}")
 
 
-def visualize_full_tif(image_data: np.ndarray, nodata_value: float = -3.4028227e+38) -> None:
+def visualize_full_tif(image_data: np.ndarray, nodata_value: float = -3.4028227e+38):
     """
     Parameters:
     - image_data (np.ndarray): 2D array from the TIFF file.
@@ -300,7 +300,7 @@ def visualize_full_tif(image_data: np.ndarray, nodata_value: float = -3.4028227e
 
 def find_min_max_in_polygon(tif_path: str,
                             nodata_value: float = -3.4028227e+38,
-                            min_threshold: float = -6000) -> tuple:
+                            min_threshold: float = -6000):
     """
     Traverse the irregular quadrilateral area surrounded by four points (a, b, c, d) in the Mars terrain TIFF file.
     Important reminder: The default value of (a, b, c, d) is the 4 boundary points of the Rous crater ice hill tif file. When using different images, you need to modify the values
@@ -371,7 +371,7 @@ def find_min_max_in_polygon(tif_path: str,
     return min_value, max_value
 
 
-def calculate_square_Length(tif_path: str, roi: tuple) -> tuple:
+def calculate_square_Length(tif_path: str, roi: tuple):
     """
         Compute the length of the side of a square formed by two points (A, B) as diagonal endpoints.
 
