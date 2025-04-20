@@ -35,11 +35,18 @@ class Visualizer(QObject):
         self.main_page.taskbar.set_avatar_signal.connect(self.set_avatar)
         self.main_page.taskbar.list_brain_signal.connect(self.list_brain)
         self.main_page.taskbar.set_brain_signal.connect(self.set_brain)
+        self.main_page.taskbar.info_avatar_signal.connect(self.info_avatar)
+
         #Setting Signal
         self.main_page.taskbar.list_map_signal.connect(self.list_map)
         self.main_page.taskbar.set_map_signal.connect(self.set_map)
         self.main_page.taskbar.report_signal.connect(self.show_report)
         self.main_page.taskbar.set_animation_speed_signal.connect(self.set_animation_speed)
+        self.main_page.taskbar.set_task_signal.connect(self.set_task)
+        self.main_page.taskbar.run_task_signal.connect(self.run_task)
+        self.main_page.taskbar.set_database_signal.connect(self.set_database_mode)
+        self.main_page.taskbar.set_max_frame_signal.connect(self.set_max_frame)
+
         # Thread pool for concurrent task execution
         self.thread_pool = QThreadPool.globalInstance()
         self.display_output_signal.connect(self.main_page.display_output)
@@ -56,6 +63,9 @@ class Visualizer(QObject):
 
     def set_avatar(self, avatar_name):
         self.event_manager.post_event(SimulatorEvent({"command": "savatar", "avatar_name": avatar_name}, task_bar=True))
+
+    def info_avatar(self, avatar_name):
+        self.main_page.taskbar.info_avatar("Success " + avatar_name)
 
     def list_brain(self):
         self.event_manager.post_event(SimulatorEvent({"command": "lbrain"}, task_bar=True))
@@ -83,6 +93,18 @@ class Visualizer(QObject):
         else:
             self.main_page.set_timer_speed(1.0)
             self.main_page.taskbar.set_animation_speed("The speed is out of range, set to 1.0")
+
+    def set_task(self, sX, sY, dX, dY):
+        self.main_page.taskbar.set_task("Success")
+
+    def run_task(self):
+        self.main_page.taskbar.run_task("Success")
+
+    def set_database_mode(self, database_mode):
+        self.main_page.taskbar.set_database_mode("Success " + database_mode )
+
+    def set_max_frame(self, max_frame):
+        self.main_page.taskbar.set_max_frame_size("Success " + str(max_frame))
 
     def on_start(self):
         """
