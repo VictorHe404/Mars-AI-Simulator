@@ -84,10 +84,17 @@ class EventManager:
 
     def post_event(self, event) -> None:
         """
-        Post the event to the event manager
+        Post the event to all registered subscribers.
+        Errors in individual subscribers are caught to avoid crashing the system.
         """
         for subscriber in self.subscribers:
-            subscriber.notify(event)
+            try:
+                subscriber.notify(event)
+            except Exception as e:
+                print(f"[Warning] Event handling failed for {subscriber} with event {event}: {e}")
+                for s in self.subscribers:
+                    s.notify(ActionStatusEvent(False, f"Event handling failed for {subscriber} with event {event}: {e}", "Event Handling"))
+
 
 
 
