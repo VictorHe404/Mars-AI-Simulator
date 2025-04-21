@@ -84,7 +84,10 @@ class Visualizer(QObject):
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         report_filename = "simulation_report.txt"
         report_path = os.path.join(cache_path, report_filename)
-        self.main_page.taskbar.show_report(report_path)
+        if not os.path.exists(report_path):
+            self.main_page.taskbar.show_report("No report found")
+        else:
+            self.main_page.taskbar.show_report(report_path)
 
     def set_animation_speed(self, speed):
         if not (speed< 0.5 or speed > 3.0):
@@ -95,15 +98,20 @@ class Visualizer(QObject):
             self.main_page.taskbar.set_animation_speed("The speed is out of range, set to 1.0")
 
     def set_task(self, sX, sY, dX, dY):
-        self.main_page.taskbar.set_task("Success")
+        self.event_manager.post_event(SimulatorEvent({"command": "stask", "x1": sX, "y1": sY, "x2": dX, "y2": dY}, task_bar=True))
 
     def run_task(self):
-        self.main_page.taskbar.run_task("Success")
+        # self.event_manager.post_event(SimulatorEvent({"command": "run"}, task_bar=True))
+        command = "run"
+        worker = CommandWorker(self.event_manager, command, task_bar=True)
+        self.thread_pool.start(worker)  # Submit task to the thread pool
 
     def set_database_mode(self, database_mode):
+        self.event_manager.post_event(SimulatorEvent({"command": "sdb", "state": database_mode}, task_bar=True))
         self.main_page.taskbar.set_database_mode("Success " + database_mode )
 
     def set_max_frame(self, max_frame):
+        self.event_manager.post_event(SimulatorEvent({"command": "smaxframe", "frame_count": max_frame}, task_bar=True))
         self.main_page.taskbar.set_max_frame_size("Success " + str(max_frame))
 
     def on_start(self):
@@ -188,12 +196,16 @@ class CommandWorker(QRunnable):
 
     output_signal = pyqtSignal(str)  # Signal to send output back
 
-    def __init__(self, event_manager, command):
+    def __init__(self, event_manager, command, task_bar=False):
         super().__init__()
         self.event_manager = event_manager
         self.command = command
+        self.task_bar = task_bar
 
     def run(self):
         """Execute the command asynchronously."""
-        self.event_manager.post_event(CommandEvent(self.command))  # Post event
+        if not self.task_bar:
+            self.event_manager.post_event(CommandEvent(self.command))  # Post event
+        else:
+            self.event_manager.post_event(SimulatorEvent({"command": self.command}, task_bar=True))
         print(f"Command processed: {self.command}")
