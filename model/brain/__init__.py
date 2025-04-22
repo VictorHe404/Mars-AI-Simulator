@@ -5,8 +5,8 @@ from .brain import Brain
 from .brain_greedy import BrainGreedy
 from .brain_Astar import BrainAStar
 from .brain_DFS import BrainDFS
-from .brain_RL import BrainRL
+
 
 #from .brain_Astar import BrainAStar
 #__all__ = ["Brain", "BrainTest", "BrainGreedy", "BrainAStar"]
-__all__ = ["Brain",  "BrainGreedy", "BrainAStar", "BrainDFS","BrainRL"]
+__all__ = ["Brain",  "BrainGreedy", "BrainAStar", "BrainDFS"]

@@ -328,8 +328,6 @@ class Simulator:
                 self.target_brain = Brain.BrainAStar()
             case "dfs":
                 self.target_brain = Brain.BrainDFS()
-            case "rl":
-                self.target_brain = Brain.BrainRL()
             case _:
                 return False
 
