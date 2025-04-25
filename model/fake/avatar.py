@@ -15,7 +15,6 @@ class Avatar:
         self.acceleration = acceleration
         self.max_slope = max_slope
         self.energy_recharge_rate = energy_recharge_rate
-        #self.sensors = sensors if sensors is not None else []
         self.detection_mask = detection_mask
 
     def print_avatar(self):

@@ -36,24 +36,28 @@ class Simulator:
     def __init__(self, database_available = True):
         """
         Initialize the Simulator class.
-
-        field:
-        target_map(np.ndarray): represent a Mars terrain data , the data will be used in current task
-        which assigned to the current simulator
-        target_avatar(Avatar) : an Avatar object assigned to the current simulator
-        brain_list(Str[]) : a Brain's name list
-        represent the available brain list the avatar can use
-        avatar_manager(AvatarManager): an AvatarManager object asssigned to the current
-        simulator, to manage the motion of the avatar
-        target_brain (Brain) : a Brain object, which is currently used by the avatar.
-        target_environment (Environment): an Environment object , represent the current
-        environment applied to the avatar
-        target_task (Task): a Task object,which represent
-        map_manager: MapManager : a MapManger object assigned to manage the map
-        result_trail: Log[] : a log list to record the information of path detected by avatar on map
-        map_minValue:float
-        map_maxValue:float
+        Fields:
+        target_map (list): Placeholder for Mars terrain data; will store the map assigned to the simulator.
+        target_avatar (Avatar or None): The Avatar object currently assigned to this simulator.
+        brain_list (list of str): List of available pathfinding brain algorithms the avatar can use (e.g., "greedy", "astar", "dfs").
+        avatar_manager (AvatarManager or None): Manages avatar actions and movement.
+        target_brain (Brain or None): The currently selected brain algorithm for the avatar.
+        target_environment (Environment): The current environment setup for the simulation.
+        target_task (Task or None): The specific task assigned to this simulation.
+        map_manager (MapManager): Handles map-related operations and management.
+        result_trail (list of Log or None): A list to log the paths taken by the avatar during simulation.
+        map_minValue (float): Minimum value in the map data (e.g., elevation).
+        map_maxValue (float): Maximum value in the map data.
+        path_finding_result (bool): Flag to indicate if a valid pathfinding result was found.
+        path_finding_counter (int): Counter for the number of pathfinding attempts or runs.
+        result_directory_path (str): Directory path to store cached results or logs.
+        result_directory_path_2 (str): Secondary directory path for alternate results/logs.
+        log_counter (int): Counter for how many logs have been generated.
+        database_available (bool): Indicates whether database integration is enabled/available.
+        avatars (list): A list to store multiple Avatar instances if needed. (Used in of_database mode)
+        max_image (int): Maximum number of images that can be handled/generated.
         """
+
         self.target_map=[]
         self.target_avatar=None
         self.brain_list=["greedy","astar", "dfs"]
@@ -115,6 +119,10 @@ class Simulator:
 
 
     def set_avatar_no_db(self, avatar_no_db:Avatar):
+        """
+        Set the avatar without using the database.
+        Updates slope info if environment is set and links brain if available.
+        """
         self.target_avatar = avatar_no_db
         if self.target_environment is not None:
             self.target_avatar.calculate_max_slope_difference(self.target_environment.get_friction(), self.target_environment.get_gravity(),10)
@@ -132,12 +140,19 @@ class Simulator:
             return [avatar.name for avatar in self.avatars]
 
     def get_target_avatar_characteristics(self):
+        """
+        Return whether an avatar is set and its string description if available.
+        """
         if self.target_avatar is None:
             return False, ""
         else:
             return True,self.target_avatar.__str__()
 
     def get_avatar_characteristics(self, name):
+        """
+        Return whether an avatar with the given name exists and its description.
+        Checks the database if available, otherwise searches the local list.
+        """
         if self.database_available:
             avatar = Avatar.get_avatar_by_name(name)
             if avatar:
@@ -224,6 +239,9 @@ class Simulator:
 
 
     def set_max_image_number(self, number:int):
+        """
+        Set the max image number if within [100, 400]. Returns True if successful.
+        """
         if number >= 100 and number <= 400:
             self.max_image = number
             print("The max image number is set to number.")
@@ -239,8 +257,6 @@ class Simulator:
         Parameters:
         name(string): represent the map’s name in the map_names
         """
-        #(self.target_map,self.map_minValue,self.map_maxValue)=(self.map_manager.get_mapByName(name))
-
         (t_map, t_min, t_max) = self.map_manager.get_mapByName(name)
         if t_min == -10000 and t_max == -10000:
             return False
@@ -278,33 +294,24 @@ class Simulator:
         self.target_task=Task(s_row,s_col,d_row,d_col)
         if self.target_brain is not None:
             self.target_brain.set_task(self.target_task)
-        #print("Debug Print")
 
 
         if len(self.target_map) != 0:
-            #print("Debug Prin2")
             save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
             if os.path.exists(save_path):
                 try:
-                    #print("Debug Prin3")
                     os.remove(save_path)
                     print(f"Deleted existing map file: {save_path}")
-                    #print("Debug Print4")
                 except Exception as e:
-                    #print("Debug Print5")
                     print(f"Error deleting file {save_path}: {e}")
-            #print("Debug Print6")
             self.plot_full_map_set_map(save_path, self.target_task)
         else:
             save_path = os.path.join(self.result_directory_path_2, f'set_task_map.png')
             if os.path.exists(save_path):
                 try:
-                    #print("Debug Prin3")
                     os.remove(save_path)
                     print(f"Deleted existing map file: {save_path}")
-                    #print("Debug Print4")
                 except Exception as e:
-                    #print("Debug Print5")
                     print(f"Error deleting file {save_path}: {e}")
 
         return True
@@ -369,7 +376,15 @@ class Simulator:
             print("The target brain is not ready yet")
             return False, False
 
+
+    """
+    The following two methods serve as the functionality of simulation running
+    """
     def run_simulation(self):
+        """
+        Run the simulation using the target brain if ready.
+        Returns success flag, path result, estimated time, and virtual time.
+        """
         if self.target_brain is None:
             print("The target brain is not ready yet")
             return False, False, 0, 0
@@ -385,7 +400,7 @@ class Simulator:
             step = max(1, total_logs // self.max_image + 1)
             actual_image_count = total_logs // step
 
-            estimated_time = int(0.25 * actual_image_count)  # 0.25s per image
+            estimated_time = int(0.25 * actual_image_count)
             virtual_time = self.result_trail[-1].get_time()
             return True, self.path_finding_result, estimated_time, virtual_time
         else:
@@ -393,6 +408,9 @@ class Simulator:
             return False, False, 0, 0
 
     def process_simulation_output(self):
+        """
+        Process and visualize the simulation results if available.
+        """
         if not self.result_trail:
             print("No result trail to process.")
             return
@@ -404,6 +422,11 @@ class Simulator:
 
     # The overall function to plot the result
     def plot_results(self):
+        """
+        Plot and save terrain maps at intervals during the avatar's path.
+        Limits image count based on max_image setting.
+        """
+
         total_logs = len(self.result_trail)
         if total_logs == 0:
             print("No result trail found.")
@@ -438,6 +461,11 @@ class Simulator:
 
     def plot_elevation_map(self, elevation_data, undetected_val, avatar_positions=None,
                            save_path=None, show_colorbar=False):
+        """
+        Plot a single elevation map with optional avatar trail and save or show it.
+        It adds the original map as the background and add light and shadowing.
+        """
+
         fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
 
         elevation_data = np.array(elevation_data, dtype=np.float32)
@@ -464,7 +492,7 @@ class Simulator:
         img = ax.imshow(masked_data, cmap=cmap, norm=norm, alpha=0.7)
         ax.contour(masked_data, levels=15, colors='black', linewidths=0.5, alpha=0.5)
 
-        # **Draw avatar trail if available**
+        # Draw avatar trail if available
         if avatar_positions:
             num_positions = len(avatar_positions)
             trail_colors = ['yellow', 'orange', 'orangered', 'red']
@@ -522,6 +550,11 @@ class Simulator:
 
     # Save the result to a log file
     def save_log_to_file(self):
+        """
+        Save detailed log data to a timestamped text file in the result directory.
+        It will generate the progressive ending of the animation.
+        """
+
         folder = os.path.join(self.result_directory_path)
         os.makedirs(folder, exist_ok=True)
 
@@ -555,6 +588,9 @@ class Simulator:
 
     # Clear the cash directory
     def clear_directory(self, pattern="*.png"):
+        """
+        Delete all files in the result directory matching the given pattern (default: *.png).
+        """
 
         files = glob.glob(os.path.join(self.result_directory_path, pattern))
         for f in files:
@@ -565,6 +601,11 @@ class Simulator:
                 print(f"Cannot Delete file: {f}. error: {e}")
 
     def plot_full_map(self, expansion_steps=10):
+        """
+        Progressively reveal the full terrain map from the avatar’s final position.
+        Saves intermediate maps to visualize expansion.
+        """
+
         if not self.result_trail:
             print("No result trail found.")
             return
@@ -609,6 +650,10 @@ class Simulator:
         self.path_finding_counter = file_counter
 
     def plot_full_map_set_map(self, save_path=None, task=None):
+        """
+        Plot and optionally save the full static terrain map with start and end points.
+        """
+
         fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
 
         terrain_map = np.array(self.target_map, dtype=np.float32)
@@ -650,6 +695,10 @@ class Simulator:
             plt.show()
 
     def export_logs_to_csv(self, csv_filename="log_export.csv"):
+        """
+        Export simulation logs to a CSV file including position, time, energy, and more.
+        """
+
         if not self.result_trail:
             print("No result trail to export.")
             return

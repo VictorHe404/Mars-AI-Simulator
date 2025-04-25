@@ -1,10 +1,15 @@
 Command Line Interface for the Visualizer
 
+================================================
+Instruction Explanation
+================================================
 The CLI for the visualizer follows a Linux-style structure:
 Command Format: command [-flag(s)] [argument(s)]
 
+[Undefined Command]
 If an undefined command is entered, the system returns: Error: Invalid command
 
+[Unmatched Arguments]
 If a command is used with invalid or missing arguments, a specific error message is returned.
 
 Example Errors: move
@@ -15,9 +20,24 @@ moveCommandError: Invalid destination format: [invalid destination]
 
 Flags: Flags allow users to modify or extend command functionality. Flags begin with a hyphen (-) and are placed before arguments.
 
-========================
+================================================
+Standard Procedure:
+================================================
+  smaxframe 200 - Set the max frames generated to be 200 (around 1 min max)
+  smap Louth_Crater_Sharp - Set the map to Louth_Crater_Sharp (More maps with lmap)
+  cavatar c1 - Create a default avatar named c1
+  savatar c1 - Set the avatar to be c1
+  sbrain greedy - Set the brain to be greedy
+  stask 20 20 35 45 - Set the task to be (20,20) to (35,45)
+  run - Wait and see the result!
+
+(More commands check the available commands list)
+
+
+
+================================================
 Available Commands:
-========================
+================================================
   lmap             - List available maps
   cavatar [name]   - Create a new avatar
   lavatar          - List all avatars
@@ -31,6 +51,7 @@ Available Commands:
   smaxframe [num]  - Set max number of frames (100–400)
 
 
+[Deep Explanation for Each Command]
 
 lmap
 Description: Lists all available maps for the user to explore.

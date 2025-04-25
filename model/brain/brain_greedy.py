@@ -59,17 +59,13 @@ class BrainGreedy(Brain):
 
 
             else:
-                #c = self.cost(x,y,next_x,next_y)
                 c = self.current_avatar.battery_consumption_rate * 10
-
                 # Recharge if the avatar cannot move due to energy
                 if c > energy:
                     while energy < max_energy:
-                        #print("Energy recharging")
                         energy += energy_recharge
                         self.time += 1
                     energy = max_energy
-                    #print("Energy recharged")
 
                 energy -= c
                 self.time += self.cost(x,y,next_x,next_y)
@@ -84,8 +80,6 @@ class BrainGreedy(Brain):
 
         # Check whether the mission succeed
         if x == end_x and y == end_y:
-            #print("The current position is ({0}, {1}), the value is {2}".format(x, y, self.detect_map[x][y]))
-            #print("The destination is reachable, task succeeded")
             log_entry = Log(index_x=x, index_y=y, detect_map=[row[:] for row in self.detect_map], time=self.time, energy=energy)
             self.task_trail.append(log_entry)
             return self.task_trail, True
@@ -99,18 +93,6 @@ class BrainGreedy(Brain):
         return True
 
     # Determine whether the position is movable
-    '''
-    def movable(self, avatar_x, avatar_y, target_x, target_y):
-        #print("Movable is called")
-        threshold = self.current_avatar.get_max_slope()
-        #print("The threshold is")
-        #print(str(threshold))
-        if abs(self.detect_map[avatar_x][avatar_y] - self.detect_map[target_x][target_y]) >= threshold:
-            return False
-        else:
-            return True
-    '''
-
     def movable(self, avatar_x, avatar_y, target_x, target_y):
         return self.current_avatar.get_movable(self.detect_map[avatar_x][avatar_y], self.detect_map[target_x][target_y])
 
@@ -144,13 +126,10 @@ class BrainGreedy(Brain):
         # If two main directions valid, add to valid moves
         for i, ((dx, dy), _) in enumerate(main_directions):
             nx, ny = avatar_x + dx, avatar_y + dy
-            #print("Checking " + str(nx) + " " + str(ny))
             if 0 <= nx < len(self.detect_map) and 0 <= ny < len(self.detect_map[0]):  # In bounds
-                #print("In bounds")
                 if (nx, ny) not in visited and self.movable(avatar_x, avatar_y, nx, ny):
                     main_directions[i] = ((dx, dy), self.cost(avatar_x, avatar_y, nx, ny))  # Update with cost
                     valid_main_moves.append(main_directions[i])
-                    #print(str(nx) + " " + str(ny) + " is valid")
 
         # Select the best greedy move if possible
         if valid_main_moves:
@@ -162,11 +141,9 @@ class BrainGreedy(Brain):
             nx, ny = avatar_x + dx, avatar_y + dy
             if (nx, ny) != parent_pos and (0 <= nx < len(self.detect_map)) and (0 <= ny < len(self.detect_map[0])):  # In bounds
                 if (nx, ny) not in visited and self.movable(avatar_x, avatar_y, nx, ny):
-                    #print(str(nx) + " " + str(ny) + " is valid")
                     return nx, ny  # Pick the first available move
 
         # Go back to parent position
-        #print("No valid moves found")
         if parents:
             # Pop the parent position on the fly
             return parents.pop()
