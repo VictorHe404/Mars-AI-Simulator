@@ -65,7 +65,7 @@ class Visualizer(QObject):
         self.event_manager.post_event(SimulatorEvent({"command": "savatar", "avatar_name": avatar_name}, task_bar=True))
 
     def info_avatar(self, avatar_name):
-        self.main_page.taskbar.info_avatar("Success " + avatar_name)
+        self.event_manager.post_event(SimulatorEvent({"command": "iavatar", "avatar_name": avatar_name}, task_bar=True))
 
     def list_brain(self):
         self.event_manager.post_event(SimulatorEvent({"command": "lbrain"}, task_bar=True))
@@ -108,11 +108,9 @@ class Visualizer(QObject):
 
     def set_database_mode(self, database_mode):
         self.event_manager.post_event(SimulatorEvent({"command": "sdb", "state": database_mode}, task_bar=True))
-        self.main_page.taskbar.set_database_mode("Success " + database_mode )
 
     def set_max_frame(self, max_frame):
         self.event_manager.post_event(SimulatorEvent({"command": "smaxframe", "frame_count": max_frame}, task_bar=True))
-        self.main_page.taskbar.set_max_frame_size("Success " + str(max_frame))
 
     def on_start(self):
         """
@@ -172,6 +170,14 @@ class Visualizer(QObject):
                     self.main_page.taskbar.set_brain(event.msg)
                 elif event.action_name == "lbrain":
                     self.main_page.taskbar.list_brain(event.msg)
+                elif event.action_name == "iavatar":
+                    self.main_page.taskbar.info_avatar(event.msg)
+                elif event.action_name == "smaxframe":
+                    self.main_page.taskbar.set_max_frame_size(event.msg)
+                elif event.action_name == "sdb":
+                    self.main_page.taskbar.set_database_mode(event.msg)
+                elif event.action_name == "stask":
+                    self.main_page.taskbar.set_task(event.msg)
 
         elif isinstance(event, VisualizerEvent):
             if event.msg == "animation":
