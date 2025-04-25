@@ -126,7 +126,7 @@ iavatar a1
 [iavatar] Info for avatar a1: [info]
 
 smaxframe [frame_count]
-Description: Sets the maximum number of animation frames to be generated during simulation output. A smaller frame number limitation will greatly increase the animation speed.
+Description: Sets the maximum number of animation frames to be generated during simulation output. A smaller frame number limitation will greatly increase the animation generation speed.
 Range: 100 to 400.
 Usage Example:
 smaxframe 200
