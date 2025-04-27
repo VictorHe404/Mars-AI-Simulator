@@ -1,13 +1,9 @@
 import csv
 import sys
-import webbrowser
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QGraphicsEllipseItem, QGraphicsPixmapItem, QSlider, QTabWidget, QTextEdit, QLineEdit, QPushButton, QFrame,
-    QMessageBox
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit
 )
-from PyQt6.QtGui import QPixmap, QPen, QColor, QBrush
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPointF, QFile
+from PyQt6.QtCore import QTimer, pyqtSignal
 import os
 
 from view.CommandPromptWidget import CommandPromptWidget
@@ -96,7 +92,7 @@ class MainPage(QMainWindow):
         self.command_prompt.display_output(message)
 
     def update_image(self):
-        """Update the map image."""
+        """Initialize the map image."""
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         pic_path = os.path.join(cache_path, f'elevation_map_{self.pic_counter}.png')
         if os.path.exists(pic_path):
@@ -107,17 +103,18 @@ class MainPage(QMainWindow):
             self.pic_counter = float('inf')
 
     def update_minimap(self, mini_map_image_path):
+        """Update the map image."""
         pic_path = os.path.join("viewImage", mini_map_image_path)
         print(pic_path)
         self.mini_map.update_minimap(pic_path)
 
     def update_mainmap(self, main_map_image_path):
+        """Update the map image."""
         self.main_map.update_mainmap(main_map_image_path)
 
     def start_visualizer(self):
         cache_path = os.path.join(os.getcwd(), 'cache_directory')
         log_path = os.path.join(cache_path, 'log_export.csv')
-        #print(log_path)
 
         with open(log_path, 'r') as file:
             reader = csv.DictReader(file)
@@ -132,8 +129,6 @@ class MainPage(QMainWindow):
                 nearby_raw = row['local_grid']
 
                 nearby_values = re.findall(r'-\d+|x', nearby_raw)
-
-                #print(f"Split nearby_values ({len(nearby_values)}): {nearby_values}")
 
                 if len(nearby_values) == 9:
                     grid = "\n".join(
@@ -170,6 +165,7 @@ class MainPage(QMainWindow):
         self.timer.setInterval(int(100 /speed))  #set FPS to 10 * speed
 
     def show_report(self, path):
+        """Show the report."""
         try:
             with open(path, 'r', encoding='iso-8859-1') as file:
                 content = file.read()
@@ -192,6 +188,7 @@ class MainPage(QMainWindow):
         window.setLayout(layout)
         window.show()
         self.report_window = window
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainPage()

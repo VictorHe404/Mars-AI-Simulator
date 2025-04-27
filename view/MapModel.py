@@ -1,10 +1,8 @@
-# --- Model ---
 import os
 
 from PyQt6.QtCore import QObject, pyqtSignal, QPointF, Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
-
 
 class MapModel(QObject):
     avatar_position_changed = pyqtSignal(QPointF)
@@ -31,6 +29,7 @@ class MiniMapView(QGraphicsView):
         self.init_minimap("viewImage/initialize.png")
 
     def init_minimap(self, relative_path):
+        """Initialize the minimap."""
         base_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(base_dir, relative_path)
 
@@ -48,6 +47,7 @@ class MiniMapView(QGraphicsView):
 
     # Update mini map function
     def update_minimap(self, mini_map_image_path):
+        """Update the minimap."""
         # Resolve absolute path
         base_dir = os.path.dirname(os.path.abspath(__file__))
         if not os.path.isabs(mini_map_image_path):

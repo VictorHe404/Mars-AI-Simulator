@@ -165,7 +165,7 @@ class Visualizer(QObject):
                 elif event.action_name == "cavatar":
                     self.main_page.taskbar.create_avatar(event.msg)
                 elif event.action_name == "savatar":
-                    self.main_page.taskbar.set_avatar(event.msg)
+                    self.main_page.taskbar.set_avatar("List", event.msg)
                 elif event.action_name == "sbrain":
                     self.main_page.taskbar.set_brain(event.msg)
                 elif event.action_name == "lbrain":

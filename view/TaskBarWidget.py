@@ -39,6 +39,7 @@ class TaskbarWidget(QWidget):
         self.create_setting_button()
         self.create_avatar_button()
         self.create_instruction_button()
+        self.create_video_button()
         self.create_github_button()
 
         self.setLayout(self.taskbar_layout)
@@ -93,6 +94,16 @@ class TaskbarWidget(QWidget):
 
         self.taskbar_layout.addWidget(self.instruction_button)
 
+    def create_video_button(self):
+        """Create Video.txt button"""
+        self.video_button = QPushButton("Instruction Video")
+        self.video_button.setFixedHeight(40)
+        self.video_button.setStyleSheet(self.button_style())
+        self.video_button.clicked.connect(
+            lambda:
+            webbrowser.open("https://drive.google.com/file/d/1BQ1OpBf3-zaDfc8R1XId1udl7MjLkjqA/view?usp=sharing"))
+        self.taskbar_layout.addWidget(self.video_button)
+
     def create_github_button(self):
         """Create GitHub button"""
         self.github_button = QPushButton("GitHub Link")
@@ -115,7 +126,7 @@ class TaskbarWidget(QWidget):
         list_map_action = QAction("List Map", self)
         set_map_action = QAction("Set Map", self)
         report_action = QAction("Report", self)
-        set_animation_action = QAction("Set Animation", self)
+        set_animation_action = QAction("Set Animation Speed", self)
         set_task_action = QAction("Set Task", self)
         run_task_action = QAction("Run", self)
         set_database_action = QAction("Set Database Mode", self)
@@ -143,7 +154,7 @@ class TaskbarWidget(QWidget):
         self.taskbar_layout.addWidget(self.setting_button)
 
     def show_avatar_menu(self):
-        """Display dropdown menu"""
+        """Display avatar dropdown menu"""
         self.avatar_menu.setFixedWidth(self.avatar_button.width())
         self.avatar_menu.exec(self.avatar_button.mapToGlobal(self.avatar_button.rect().bottomLeft()))
 
@@ -170,14 +181,15 @@ class TaskbarWidget(QWidget):
     def __set_avatar_button__(self):
         avatar_name, ok_pressed = QInputDialog.getText(
             self,
-            "Set Avatar Name",
+            "" +
+            "\nSet Avatar Name",
             "Enter Avatar name:"
         )
         if ok_pressed:
             self.set_avatar_signal.emit(avatar_name)
 
     def set_avatar(self, avatar_name):
-        QMessageBox.information(self, "Set Avatar", avatar_name)
+        QMessageBox.information(self, avatar_name)
 
     def __info_avatar_button__(self):
         avatar_name, ok_pressed = QInputDialog.getText(
@@ -253,7 +265,7 @@ class TaskbarWidget(QWidget):
         animation_speed, ok_pressed = QInputDialog.getText(
             self,
             "Set Animation Speed",
-            "Enter speed (Float):"
+            "Enter speed (Float from 0.5 to 3.0):"
         )
         if ok_pressed:
             try:

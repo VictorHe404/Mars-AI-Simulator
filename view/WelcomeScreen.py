@@ -56,6 +56,10 @@ class WelcomePage(QMainWindow):
         instruction_button.setStyleSheet(button_style)
         instruction_button.clicked.connect(self.show_instructions)
 
+        video_button = QPushButton("Instruction Video")
+        video_button.setStyleSheet(button_style)
+        video_button.clicked.connect(self.instruction_video)
+
         github_button = QPushButton("GitHub Link")
         github_button.setStyleSheet(button_style)
         github_button.clicked.connect(self.open_github)
@@ -70,6 +74,7 @@ class WelcomePage(QMainWindow):
 
         # Add buttons to button layout
         button_layout.addWidget(instruction_button)
+        button_layout.addWidget(video_button)
         button_layout.addWidget(github_button)
         button_layout.addWidget(about_button)
 
@@ -149,6 +154,9 @@ class WelcomePage(QMainWindow):
         """Emit the start signal to transition to the main application."""
         print("Starting application...")
         self.start_signal.emit()
+
+    def instruction_video(self):
+        webbrowser.open("https://drive.google.com/file/d/1BQ1OpBf3-zaDfc8R1XId1udl7MjLkjqA/view?usp=sharing")
 
 
 if __name__ == "__main__":
