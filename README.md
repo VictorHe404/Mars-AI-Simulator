@@ -71,6 +71,9 @@ Python 3.11 (recommended) or 3.12
 
 ## 3. Instruction
 
+Instruction Video:
+https://drive.google.com/file/d/1BQ1OpBf3-zaDfc8R1XId1udl7MjLkjqA/view?usp=sharing
+
 Command Line Interface for the Visualizer
 
 The CLI for the visualizer follows a Linux-style structure:
