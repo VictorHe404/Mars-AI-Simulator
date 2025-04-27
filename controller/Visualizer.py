@@ -56,6 +56,7 @@ class Visualizer(QObject):
 
     #TaskBar Singals
     def list_avatar(self):
+        self.event_manager.post_event(SimulatorEvent({"command": "lavatar"}))
         self.event_manager.post_event(SimulatorEvent({"command": "lavatar"}, task_bar=True))
 
     def create_avatar(self, avatar_name):
@@ -68,13 +69,14 @@ class Visualizer(QObject):
         self.event_manager.post_event(SimulatorEvent({"command": "iavatar", "avatar_name": avatar_name}, task_bar=True))
 
     def list_brain(self):
+        self.event_manager.post_event(SimulatorEvent({"command": "lbrain"}))
         self.event_manager.post_event(SimulatorEvent({"command": "lbrain"}, task_bar=True))
 
     def set_brain(self, brain_name):
         self.event_manager.post_event(SimulatorEvent({"command": "sbrain", "brain_name": brain_name}, task_bar=True))
 
     def list_map(self):
-        print("Task bar: list_map")
+        self.event_manager.post_event(SimulatorEvent({"command": "lmap"}))
         self.event_manager.post_event(SimulatorEvent({"command": "lmap"}, task_bar=True))
 
     def set_map(self, map_name):
