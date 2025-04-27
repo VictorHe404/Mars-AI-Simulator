@@ -18,7 +18,8 @@ moveCommandError: Destination not specified.
 move [invalid destination]
 moveCommandError: Invalid destination format: [invalid destination]
 
-Flags: Flags allow users to modify or extend command functionality. Flags begin with a hyphen (-) and are placed before arguments.
+Flags: Flags allow users to modify or extend command functionality.
+Flags begin with a hyphen (-) and are placed before arguments.
 
 ================================================
 Standard Procedure:
@@ -103,7 +104,8 @@ sbrain astar
 
 
 stask [start_row] [start_column] [destination_row] [destination_column]
-Description: Sets a task for the current avatar to move from (start_row, start_column) to (destination_row, destination_column).
+Description: Sets a task for the current avatar to move from (start_row, start_column) to
+(destination_row, destination_column).
 
 run
 Description: Executes the pre-set task assigned to the current avatar.
@@ -118,7 +120,9 @@ report [-flag(s)]
 Description: Generates a report about the current avatar and its status. Takes no arguments.
 
 iavatar [avatarname]
-Description: find a specific avatar by name and display its information. If the avatar is not found, an error message is displayed. If the [avatarname] is not specified, the currently selected avatar is used.
+Description: find a specific avatar by name and display its information.
+If the avatar is not found, an error message is displayed.
+If the [avatarname] is not specified, the currently selected avatar is used.
 Usage Example:
 iavatar
 [iavatar] Info for currently selected avatar:[info]
@@ -126,7 +130,8 @@ iavatar a1
 [iavatar] Info for avatar a1: [info]
 
 smaxframe [frame_count]
-Description: Sets the maximum number of animation frames to be generated during simulation output. A smaller frame number limitation will greatly increase the animation generation speed.
+Description: Sets the maximum number of animation frames to be generated during simulation output.
+A smaller frame number limitation will greatly increase the animation generation speed.
 Range: 100 to 400.
 Usage Example:
 smaxframe 200
